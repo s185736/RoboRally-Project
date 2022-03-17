@@ -53,6 +53,24 @@ public class GameController {
         //   - the counter of moves in the game should be increased by one
         //     if the player is moved
 
+        Player current = board.getCurrentPlayer();
+        current.setSpace(space);
+        int num = board.getPlayerNumber(current);
+        Player next = board.getPlayer((num + 1) % board.getPlayersNumber());
+        board.setCurrentPlayer(next);
+
+        /* TODO list to the team (watch the video linked in the Discord server).
+        *Vi skal gøre det bedre, ved at:
+        *    - hvis space == 0 går der noget galt.
+        *    - hvis der står en spiller på en felt, kan der gå noget galt.
+        *
+        * Vores mål er, at:
+        *   - Laves med if-then-else, så man ikke gøre noget hvis der står en spiller eller hvis space er 0,
+        *     så skal vi ikke gøre noget.*/
+        /**/
+
+        /*Updated amount of bricks.*/
+        board.setCount(board.getCount() + 1);
     }
 
     /**
