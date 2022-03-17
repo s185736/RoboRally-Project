@@ -201,34 +201,27 @@ public class Board extends Subject {
     }
 
     public String getStatusMessage() {
-        // This is actually a view aspect, but for making the first task easy for
+        // this is actually a view aspect, but for making assignment V1 easy for
         // the students, this method gives a string representation of the current
         // status of the game
 
-        // TODO Assignment V1: this string could eventually be refined
-        //      The status line should show more information based on
-        //      situation; for now, introduce a counter to the Board,
-        //      which is counted up every time a player makes a move; the
-        //      status line should show the current player and the number
-        //      of the current move!
-        return "Player = " + getCurrentPlayer().getName() + ": (Amount of moves: "+getCount()+")";
-    }
-
-    // TODO Assignment V1: add a counter along with a getter and a setter, so the
-    //      state the board (game) contains the number of moves, which then can
-    //      be used to extend the status message including the number of
-
-    /*Below; counting the number of moves in the board.*/
-    private int count;
-
-    /*Setter & Getter*/
-    public int getCount() {
-        return count;
-    }
-    public void setCount(int count) {
-        if (this.count != count) {
-            this.count = count;
-            notifyChange();
+        // XXX: V2 changed the status so that it shows the phase, the player and the step
+        return "Phase: " + getPhase().name() +
+                ", Player = " + getCurrentPlayer().getName() +
+                ", Step: " + getStep() +
+                "(Amount of moves: "+getCount()+")";
         }
-    }
+        /*Below; counting the number of moves in the board.*/
+        private int count;
+
+        /*Setter & Getter*/
+        public int getCount() {
+            return count;
+        }
+        public void setCount(int count) {
+            if (this.count != count) {
+                this.count = count;
+                notifyChange();
+            }
+      }
 }
