@@ -53,24 +53,15 @@ public class GameController {
         //   - the counter of moves in the game should be increased by one
         //     if the player is moved
 
-        Player current = board.getCurrentPlayer();
-        current.setSpace(space);
-        int num = board.getPlayerNumber(current);
-        Player next = board.getPlayer((num + 1) % board.getPlayersNumber());
-        board.setCurrentPlayer(next);
+        if (space != null && space.board == board) {
+            Player currentPlayer = board.getCurrentPlayer();
+            if (currentPlayer != null && space.getPlayer() == null) {
+                currentPlayer.setSpace(space);
+                int playerNumber = (board.getPlayerNumber(currentPlayer) + 1) % board.getPlayersNumber();
+                board.setCurrentPlayer(board.getPlayer(playerNumber));
+            }
+        }
 
-        /* TODO list to the team (watch the video linked in the Discord server).
-         *Vi skal gøre det bedre, ved at:
-         *    - hvis space == 0 går der noget galt.
-         *    - hvis der står en spiller på en felt, kan der gå noget galt.
-         *
-         * Vores mål er, at:
-         *   - Laves med if-then-else, så man ikke gøre noget hvis der står en spiller eller hvis space er 0,
-         *     så skal vi ikke gøre noget.*/
-        /**/
-
-        /*Updated amount of bricks.*/
-        board.setCount(board.getCount() + 1);
     }
 
     // XXX: V2
@@ -213,24 +204,39 @@ public class GameController {
         }
     }
 
-    // TODO Assignment V2
+    // TODO: V2
     public void moveForward(@NotNull Player player) {
-
+        Space space = player.getSpace();
+        if (player != null && player.board == board && space != null) {
+            Heading heading = player.getHeading();
+            Space target = board.getNeighbour(space, heading);
+            if (target != null) {
+                // XXX note that this removes an other player from the space, when there
+                //     is another player on the target. Eventually, this needs to be
+                //     implemented in a way so that other players are pushed away!
+                target.setPlayer(player);
+            }
+        }
     }
 
-    // TODO Assignment V2
+    // TODO: V2
     public void fastForward(@NotNull Player player) {
-
+        moveForward(player);
+        moveForward(player);
     }
 
-    // TODO Assignment V2
+    // TODO: V2
     public void turnRight(@NotNull Player player) {
-
+        if (player != null && player.board == board) {
+            player.setHeading(player.getHeading().next());
+        }
     }
 
-    // TODO Assignment V2
+    // TODO: V2
     public void turnLeft(@NotNull Player player) {
-
+        if (player != null && player.board == board) {
+            player.setHeading(player.getHeading().prev());
+        }
     }
 
     public boolean moveCards(@NotNull CommandCardField source, @NotNull CommandCardField target) {

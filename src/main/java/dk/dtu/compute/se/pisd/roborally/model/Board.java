@@ -208,20 +208,8 @@ public class Board extends Subject {
         // XXX: V2 changed the status so that it shows the phase, the player and the step
         return "Phase: " + getPhase().name() +
                 ", Player = " + getCurrentPlayer().getName() +
-                ", Step: " + getStep() +
-                "(Amount of moves: "+getCount()+")";
-        }
-        /*Below; counting the number of moves in the board.*/
-        private int count;
+                ", Step: " + getStep();
+    }
 
-        /*Setter & Getter*/
-        public int getCount() {
-            return count;
-        }
-        public void setCount(int count) {
-            if (this.count != count) {
-                this.count = count;
-                notifyChange();
-            }
-      }
+
 }
