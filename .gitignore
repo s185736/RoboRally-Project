@@ -1,0 +1,5 @@
+# disable the intellij IDEA folder
+/.idea
+.idea
+.idea/
+target
