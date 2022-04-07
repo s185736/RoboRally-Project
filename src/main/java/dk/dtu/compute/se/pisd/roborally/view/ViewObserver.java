@@ -19,9 +19,11 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-package dk.dtu.compute.se.pisd.roborally.controller;
+package dk.dtu.compute.se.pisd.roborally.view;
 
-import dk.dtu.compute.se.pisd.roborally.model.Space;
+import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
+import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
+import javafx.application.Platform;
 
 /**
  * ...
@@ -29,16 +31,20 @@ import dk.dtu.compute.se.pisd.roborally.model.Space;
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */
-public abstract class FieldAction {
+public interface ViewObserver extends Observer {
 
-    /**
-     * Executes the field action for a given space. In order to be able to do
-     * that the GameController associated with the game is passed to this method.
-     *
-     * @param gameController the gameController of the respective game
-     * @param space the space this action should be executed for
-     * @return whether the action was successfully executed
-     */
-    public abstract boolean doAction(GameController gameController, Space space);
+    void updateView(Subject subject);
+
+    @Override
+    default void update(Subject subject) {
+        // This default implementation of the update method makes sure that ViewObserver implementations
+        // are doing the update only in the FX application thread. The update of the view is instead
+        // done in the updateView() method;
+        if (Platform.isFxApplicationThread()) {
+            updateView(subject);
+        } else {
+            Platform.runLater(() -> updateView(subject));
+        }
+    }
 
 }
