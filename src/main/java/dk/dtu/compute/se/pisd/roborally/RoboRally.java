@@ -37,6 +37,7 @@ import javafx.stage.Stage;
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */
+
 public class RoboRally extends Application {
 
     private static final int MIN_APP_WIDTH = 600;
