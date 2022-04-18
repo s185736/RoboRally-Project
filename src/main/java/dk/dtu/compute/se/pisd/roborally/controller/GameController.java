@@ -154,6 +154,8 @@ public class GameController {
                 if (card != null) {
                     Command command = card.command;
                     executeCommand(currentPlayer, command);
+                } else {
+                    executeCommandOptionAndContinue(currentPlayer, currentPlayer.getProgramField(step).getCard());
                 }
                 int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
                 if (nextPlayerNumber < board.getPlayersNumber()) {
@@ -202,6 +204,13 @@ public class GameController {
                     // DO NOTHING (for now)
             }
         }
+    }
+
+    private void executeCommandOptionAndContinue(@NotNull Player player, CommandCard card) {
+        if (card == null) {
+            return;
+        }
+        executeCommand(player, card.command);
     }
 
     // TODO: V2
