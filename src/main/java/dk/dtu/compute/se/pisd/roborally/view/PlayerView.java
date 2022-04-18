@@ -216,25 +216,27 @@ public class PlayerView extends Tab implements ViewObserver {
                 }*/
                 if (player.board.getCurrentPlayer() == player) {
                     CommandCardField field = player.getProgramField(player.board.getStep());
-                    if (field != null) {
-                        CommandCard card = field.getCard();
-                        if (card != null) {
-                            Command command = card.command;
-                            if (command.isInteractive()) {
-                                for (Command option : command.getOptions()) {
-                                    Button optButton = new Button("Option1");
-                                    optButton.setOnAction( e -> gameController.notImplemented());
-                                    optButton.setDisable(false);
-                                    playerInteractionPanel.getChildren().add(optButton);
+                    if (field == null) {
+                        return;
+                    }
+                    CommandCard card = field.getCard();
+                    if (card == null) {
+                        return;
+                    }
+                    Command command = card.command;
+                    if (command.isInteractive()) {
+                        for (Command option : command.getOptions()) {
+                            Button optButton = new Button("Option1");
+                            optButton.setOnAction( e -> gameController.notImplemented());
+                            optButton.setDisable(false);
+                            playerInteractionPanel.getChildren().add(optButton);
 
-                                    optButton = new Button("Option 2");
-                                    optButton.setOnAction( e -> gameController.notImplemented());
-                                    optButton.setDisable(false);
-                                    playerInteractionPanel.getChildren().add(optButton);
-                                }
-
-                            }
+                            optButton = new Button("Option 2");
+                            optButton.setOnAction( e -> gameController.notImplemented());
+                            optButton.setDisable(false);
+                            playerInteractionPanel.getChildren().add(optButton);
                         }
+
                     }
                 }
             }
