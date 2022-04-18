@@ -10,6 +10,7 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 
 Linux/Mac
 --module-path /path/to/javafx-sdk-17.0.1/lib --add-modules javafx.controls,javafx.fxml
+
 Windows
 --module-path "\path\to\javafx-sdk-17.0.1\lib" --add-modules javafx.controls,javafx.fxml
 
