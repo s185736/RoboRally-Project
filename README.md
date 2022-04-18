@@ -1,6 +1,6 @@
 # RoboRally-Project
 
-This is a Roborally project from the course [02324](https://kurser.dtu.dk/course/02324) at [DTU](https://dtu.dk).
+This is a Roborally project from the course [02324](https://kurser.dtu.dk/course/02324) at [DTU](https://www.dtu.dk/).
 
 ## How to run the Application (Through IntelliJ)
 1. First of all, open the IDE and clone the project or replace the files with your empty Maven project.
