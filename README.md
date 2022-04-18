@@ -1,4 +1,4 @@
-# RoboRally-Project
+# RoboRally-Project - G17
 
 This is a Roborally project from the course [02324](https://kurser.dtu.dk/course/02324) at [DTU](https://www.dtu.dk/).
 
