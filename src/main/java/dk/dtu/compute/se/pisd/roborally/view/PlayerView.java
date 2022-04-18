@@ -91,13 +91,13 @@ public class PlayerView extends Tab implements ViewObserver {
         //      refactored.
 
         finishButton = new Button("Finish Programming");
-        finishButton.setOnAction( e -> gameController.finishProgrammingPhase());
+        finishButton.setOnAction(e -> gameController.finishProgrammingPhase());
 
         executeButton = new Button("Execute Program");
-        executeButton.setOnAction( e-> gameController.executePrograms());
+        executeButton.setOnAction(e -> gameController.executePrograms());
 
         stepButton = new Button("Execute Current Register");
-        stepButton.setOnAction( e-> gameController.executeStep());
+        stepButton.setOnAction(e -> gameController.executeStep());
 
         buttonPanel = new VBox(finishButton, executeButton, stepButton);
         buttonPanel.setAlignment(Pos.CENTER_LEFT);
@@ -138,7 +138,7 @@ public class PlayerView extends Tab implements ViewObserver {
             for (int i = 0; i < Player.NO_REGISTERS; i++) {
                 CardFieldView cardFieldView = programCardViews[i];
                 if (cardFieldView != null) {
-                    if (player.board.getPhase() == Phase.PROGRAMMING ) {
+                    if (player.board.getPhase() == Phase.PROGRAMMING) {
                         cardFieldView.setBackground(CardFieldView.BG_DEFAULT);
                     } else {
                         if (i < player.board.getStep()) {
@@ -198,11 +198,12 @@ public class PlayerView extends Tab implements ViewObserver {
                 }
                 playerInteractionPanel.getChildren().clear();
 
-                if (player.board.getCurrentPlayer() == player) {
+               /* if (player.board.getCurrentPlayer() == player) {
                     // TODO Assignment p3: these buttons should be shown only when there is
                     //      an interactive command card, and the buttons should represent
                     //      the player's choices of the interactive command card. The
                     //      following is just a mockup showing two options
+
                     Button optionButton = new Button("Option1");
                     optionButton.setOnAction( e -> gameController.notImplemented());
                     optionButton.setDisable(false);
@@ -212,9 +213,31 @@ public class PlayerView extends Tab implements ViewObserver {
                     optionButton.setOnAction( e -> gameController.notImplemented());
                     optionButton.setDisable(false);
                     playerInteractionPanel.getChildren().add(optionButton);
+                }*/
+                if (player.board.getCurrentPlayer() == player) {
+                    CommandCardField field = player.getProgramField(player.board.getStep());
+                    if (field != null) {
+                        CommandCard card = field.getCard();
+                        if (card != null) {
+                            Command command = card.command;
+                            if (command.isInteractive()) {
+                                for (Command option : command.getOptions()) {
+                                    Button optButton = new Button("Option1");
+                                    optButton.setOnAction( e -> gameController.notImplemented());
+                                    optButton.setDisable(false);
+                                    playerInteractionPanel.getChildren().add(optButton);
+
+                                    optButton = new Button("Option 2");
+                                    optButton.setOnAction( e -> gameController.notImplemented());
+                                    optButton.setDisable(false);
+                                    playerInteractionPanel.getChildren().add(optButton);
+                                }
+
+                            }
+                        }
+                    }
                 }
             }
         }
     }
-
 }
