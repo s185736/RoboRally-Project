@@ -7,3 +7,5 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 2. Secondly, download [JavaFX](https://gluonhq.com/products/javafx/) and set it up. The software uses JavaFX UI framework. If you have problem with building the software and maven’s JavaFX installation, here you can find detailed information how to install it manually and setup the project properly, by following this tutorial: [HowToJavaFX](https://openjfx.io/openjfx-docs/#IDE-Intellij). 
 3. Start the program in the class `StartRoboRally`, this class will start the program. Remember to follow the tutorial properly, at the end you'll have to add VM Options.
 4. Click 'file', and then 'New Game'.
+5. Choose amount of players.
+6. You're ready to play.
