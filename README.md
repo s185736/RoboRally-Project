@@ -15,4 +15,10 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 ## Current 'Extra' Features
 - Checkpoints - Will be shown on the panel.
 - Antenna - Still in progress.
-- Player will move when landing on another's space.
+- The other Player will move when landing on another's space.
+
+
+##TODO (Problems)
+Below are the problems that will be solved as soon as possible.
+- 'Turn Left or Right' card is not working, not showing the options.
+- Not showing all cards when executing the program.
