@@ -22,7 +22,14 @@
 package dk.dtu.compute.se.pisd.roborally.controller;
 
 import dk.dtu.compute.se.pisd.roborally.model.*;
+import javafx.scene.control.Alert;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+import java.util.stream.IntStream;
+
+import static java.lang.Math.*;
+import static java.util.Collections.*;
 
 /**
  * ...
@@ -33,6 +40,7 @@ import org.jetbrains.annotations.NotNull;
 public class GameController {
 
     final public Board board;
+    public boolean won = false;
 
     public GameController(@NotNull Board board) {
         this.board = board;
@@ -90,7 +98,7 @@ public class GameController {
     // XXX: V2
     private CommandCard generateRandomCommandCard() {
         Command[] commands = Command.values();
-        int random = (int) (Math.random() * commands.length);
+        int random = (int) (random() * commands.length);
         return new CommandCard(commands[random]);
     }
 
@@ -125,17 +133,12 @@ public class GameController {
         }
     }
 
-    public void executePrograms() {
-        board.setStepMode(false);
-        continuePrograms();
-    }
-
-    /*public void executePrograms() {
+   public void executePrograms() {
         board.setStepMode(false);
         while (board.getPhase() == Phase.ACTIVATION) {
             continuePrograms();
         }
-    }*/
+    }
 
 
     // XXX: V2
@@ -152,23 +155,66 @@ public class GameController {
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
 
+
+    private void findPlayerOrder() {
+        Antenna object = this.board.getAntenna();
+        Map<Player, Integer> order = new HashMap<>();
+        int x = 0;
+        while (x < this.board.width) {
+            for (int y = 0; y < this.board.height; y++) {
+                Player player = this.board.getSpace(x, y).getPlayer();
+                if (player == null) {
+                    continue;
+                }
+                int final_length = abs(object.x - x) + abs(object.y - y);
+                order.put(player, final_length);
+            }
+            x++;
+        }
+
+        List<Map.Entry<Player, Integer>> list;
+        list = new LinkedList<>(order.entrySet());
+        sort(list, (robot1, robot2) -> {
+            if (robot1.getValue() != robot2.getValue()) {
+                return robot1.getValue() - robot2.getValue();
+            } else {
+                /*If so, all robots have the same space/length to the object.*/
+                if (robot2.getKey().getSpace().y <= object.y || robot1.getKey().getSpace().y <= object.y) {
+                    if (robot2.getKey().getSpace().y < object.y && robot1.getKey().getSpace().y < object.y) {
+                        return robot2.getKey().getSpace().x - robot1.getKey().getSpace().x; //All robots are under the object.
+                    }
+                    if (robot2.getKey().getSpace().y <= object.y && robot1.getKey().getSpace().y <= object.y) {
+                        return 0;
+                    }
+                    return robot1.getKey().getSpace().x - robot2.getKey().getSpace().x; //One robot is over the object.
+                } else {
+                    return robot1.getKey().getSpace().x - robot2.getKey().getSpace().x; //All robots are over the object.
+                }
+            }
+        });
+        IntStream.range(0, list.size()).forEach(i -> list.get(i).getKey().no = i);
+        this.board.setCurrentPlayer(list.get(0).getKey());
+    }
+
+    
     // XXX: V2
     private void executeNextStep(Command command) {
-        Player currentPlayer = board.getCurrentPlayer();
-        if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
+        Player currPlayer = board.getCurrentPlayer();
+        if (board.getPhase() == Phase.ACTIVATION && currPlayer != null) {
             int step = board.getStep();
             if (step >= 0 && step < Player.NO_REGISTERS) {
-                CommandCard card = currentPlayer.getProgramField(step).getCard();
+                CommandCard card = currPlayer.getProgramField(step).getCard();
                 if (card != null) {
                     command = card.command;
-                    executeCommand(currentPlayer, command);
+                    executeCommand(currPlayer, command);
                 } else {
-                    executeCommandOptionAndContinue(currentPlayer, currentPlayer.getProgramField(step).getCard());
+                    executeCommandOptionAndContinue(currPlayer, currPlayer.getProgramField(step).getCard());
                 }
-                int nextPlayerNumber = board.getPlayerNumber(currentPlayer) + 1;
+                int nextPlayerNumber = board.getPlayerNumber(currPlayer) + 1;
                 if (nextPlayerNumber < board.getPlayersNumber()) {
                     board.setCurrentPlayer(board.getPlayer(nextPlayerNumber));
                 } else {
+                    findPlayerOrder();
                     step++;
                     if (step < Player.NO_REGISTERS) {
                         makeProgramFieldsVisible(step);
@@ -240,12 +286,15 @@ public class GameController {
             executePrograms();
     }
 
- /*private void execute(Command command) {
-        executeNextStep(command);
-        if (board.getPhase() == Phase.ACTIVATION && !board.isStepMode()) {
-            executePrograms();
-        }
-    }*/
+
+    /**
+     * @param player
+     */
+    public void findWinner(Player player) {
+        Alert finalAnnouncement = new Alert(Alert.AlertType.INFORMATION, player.getName() + " has won the Game!");
+        this.won = true;
+        finalAnnouncement.showAndWait();
+    }
 
     /**
      *

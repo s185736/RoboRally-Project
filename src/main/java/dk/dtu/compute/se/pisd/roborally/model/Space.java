@@ -41,6 +41,7 @@ public class Space extends Subject {
     public final int y;
 
     private Player player;
+    public List<FieldAction> actions = new ArrayList<>();
     private List<Heading> walls = new ArrayList<>();
 
     public Space(Board board, int x, int y) {
@@ -116,6 +117,19 @@ public class Space extends Subject {
         return walls;
     }
 
+    public List<FieldAction> getActions() {
+        return actions;
+    }
+
+    public void addAction(FieldAction action) {
+        this.actions.add(action);
+        if (!(action instanceof CheckPoint)) {
+        } else {
+            this.board.setCheckPoint((CheckPoint) action);
+        }
+
+        notifyChange();
+    }
 
     void playerChanged() {
         // This is a minor hack; since some views that are registered with the space

@@ -38,10 +38,10 @@ public class Player extends Subject {
     final public static int NO_CARDS = 8;
 
     final public Board board;
-    private int last_CheckPoints;
+    private int checkpoint;
     private String name;
     private String color;
-
+    public int no;
     private Space space;
     private Heading heading = SOUTH;
 
@@ -133,16 +133,16 @@ public class Player extends Subject {
         return cards[i];
     }
 
-    public void setLastCheckPoints(int last_CheckPoints) {
-        if (last_CheckPoints != (this.last_CheckPoints + 1)) {
+    public void setLastCheckPoints(int checkpoint) {
+        if (checkpoint != (this.checkpoint + 1)) {
             return;
         }
-        this.last_CheckPoints = last_CheckPoints;
+        this.checkpoint = checkpoint;
         notifyChange();
     }
 
     public int getLastCheckPoints() {
-        return last_CheckPoints;
+        return checkpoint;
     }
 }
 

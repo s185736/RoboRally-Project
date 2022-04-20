@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerView extends Tab implements ViewObserver {
 
     private Player player;
-    public Label last_CheckPointsL;
+    public Label checkpointLabel;
 
     private VBox top;
 
@@ -100,9 +100,9 @@ public class PlayerView extends Tab implements ViewObserver {
         stepButton = new Button("Execute Current Register");
         stepButton.setOnAction(e -> gameController.executeStep());
 
-        last_CheckPointsL = new Label("The Last Check Point: " + this.player.getLastCheckPoints());
+        checkpointLabel = new Label("The Last Check Point: " + this.player.getLastCheckPoints());
 
-        buttonPanel = new VBox(finishButton, executeButton, stepButton, last_CheckPointsL);
+        buttonPanel = new VBox(finishButton, executeButton, stepButton, checkpointLabel);
         buttonPanel.setAlignment(Pos.CENTER_LEFT);
         buttonPanel.setSpacing(3.0);
         // programPane.add(buttonPanel, Player.NO_REGISTERS, 0); done in update now
@@ -138,7 +138,7 @@ public class PlayerView extends Tab implements ViewObserver {
     @Override
     public void updateView(Subject subject) {
         if (subject == player) {
-            this.last_CheckPointsL.setText("The Last Check Point: " + ((Player) subject).getLastCheckPoints());
+            this.checkpointLabel.setText("The Last Check Point: " + ((Player) subject).getLastCheckPoints());
         }
         if (subject == player.board) {
             for (int i = 0; i < Player.NO_REGISTERS; i++) {

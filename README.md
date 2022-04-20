@@ -9,3 +9,10 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 4. Click 'file', and then 'New Game'.
 5. Choose amount of players.
 6. You're ready to play.
+
+
+
+## Current 'Extra' Features
+- Checkpoints - Will be shown on the panel.
+- Antenna - Still in progress.
+- Player will move when landing on another's space.

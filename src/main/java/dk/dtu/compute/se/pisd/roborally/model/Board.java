@@ -25,6 +25,7 @@ import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static dk.dtu.compute.se.pisd.roborally.model.Phase.INITIALISATION;
@@ -49,6 +50,10 @@ public class Board extends Subject {
 
     private final List<Player> players = new ArrayList<>();
 
+    private List<CheckPoint> checkpoint = new ArrayList<>();
+
+    private Antenna antenna;
+
     private Player current;
 
     private Phase phase = INITIALISATION;
@@ -62,6 +67,7 @@ public class Board extends Subject {
         this.width = width;
         this.height = height;
         spaces = new Space[width][height];
+        this.antenna = new Antenna(this, ((int) (Math.random() * width)), ((int) (Math.random() * height)));
         for (int x = 0; x < width; x++) {
             for(int y = 0; y < height; y++) {
                 Space space = new Space(this, x, y);
@@ -200,6 +206,27 @@ public class Board extends Subject {
 
         return getSpace(x, y);
     }*/
+
+    public Antenna getAntenna() {
+        return this.antenna;
+    }
+
+    public void setAntenna(Antenna antenna) {
+        this.antenna = antenna;
+        Arrays.stream(this.spaces).flatMap(Arrays::stream).forEach(Space::playerChanged);
+    }
+
+    public List<CheckPoint> getCheckPoints() {
+        return this.checkpoint;
+    }
+
+    public void setCheckPoint(CheckPoint checkpoint) {
+        this.checkpoint.add(checkpoint);
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
 
     public String getStatusMessage() {
         // this is actually a view aspect, but for making assignment V1 easy for
