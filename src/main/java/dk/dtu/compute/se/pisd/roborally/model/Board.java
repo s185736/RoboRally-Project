@@ -179,7 +179,8 @@ public class Board extends Subject {
      * @param heading the heading of the neighbour
      * @return the space in the given direction; null if there is no (reachable) neighbour
      */
-    public Space getNeighbour(@NotNull Space space, @NotNull Heading heading) {
+    /*This can be removed, due to moving and improved this method in class: Space > get_NBR_Space*/
+    /*public Space getNeighbour(@NotNull Space space, @NotNull Heading heading) {
         int x = space.x;
         int y = space.y;
         switch (heading) {
@@ -198,7 +199,7 @@ public class Board extends Subject {
         }
 
         return getSpace(x, y);
-    }
+    }*/
 
     public String getStatusMessage() {
         // this is actually a view aspect, but for making assignment V1 easy for

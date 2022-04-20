@@ -36,6 +36,7 @@ public class CommandCardField extends Subject {
     private CommandCard card;
 
     private boolean visible;
+    private boolean active;
 
     public CommandCardField(Player player) {
         this.player = player;
@@ -61,6 +62,21 @@ public class CommandCardField extends Subject {
     public void setVisible(boolean visible) {
         if (visible != this.visible) {
             this.visible = visible;
+            notifyChange();
+        }
+    }
+
+    public boolean isActive() { return active;}
+
+    /**
+     * Currently has the same function as setVisible...
+     * We're currently working on this.
+     *
+     * @param active
+     */
+    public void setActive(boolean active) {
+        if (active != this.active) {
+            this.active = active;
             notifyChange();
         }
     }

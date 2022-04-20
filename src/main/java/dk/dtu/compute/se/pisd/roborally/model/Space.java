@@ -22,6 +22,10 @@
 package dk.dtu.compute.se.pisd.roborally.model;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ...
@@ -37,6 +41,7 @@ public class Space extends Subject {
     public final int y;
 
     private Player player;
+    private List<Heading> walls = new ArrayList<>();
 
     public Space(Board board, int x, int y) {
         this.board = board;
@@ -64,6 +69,53 @@ public class Space extends Subject {
             notifyChange();
         }
     }
+
+    /**
+     * @param heading
+     * @return
+     */
+    public Space get_NBR_Space(@NotNull Heading heading) {
+        int update_cordX;
+        int update_cordY;
+        switch (heading) {
+            case NORTH -> {
+                update_cordX = x;
+                update_cordY = (y - 1) % board.height;
+                if (update_cordY != -1) {
+                } else {
+                    update_cordY = 7;
+                }
+            }
+            case SOUTH -> {
+                update_cordX = x;
+                update_cordY = (y + 1) % board.height;
+            }
+            case WEST -> {
+                update_cordX = (x - 1) % board.width;
+                if (update_cordX != -1) {
+                } else {
+                    update_cordX = 7;
+                }
+                update_cordY = y;
+            }
+            case EAST -> {
+                update_cordX = (x + 1) % board.width;
+                update_cordY = y;
+            }
+            default -> {
+                throw new IllegalStateException("Shouldn't occur; Not an expected value: " + heading);
+            }
+        }
+        return this.board.getSpace(update_cordX, update_cordY);
+    }
+
+    /**
+     * @return
+     */
+    public List<Heading> getWalls() {
+        return walls;
+    }
+
 
     void playerChanged() {
         // This is a minor hack; since some views that are registered with the space

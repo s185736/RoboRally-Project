@@ -99,6 +99,7 @@ public class PlayerView extends Tab implements ViewObserver {
         stepButton = new Button("Execute Current Register");
         stepButton.setOnAction(e -> gameController.executeStep());
 
+
         buttonPanel = new VBox(finishButton, executeButton, stepButton);
         buttonPanel.setAlignment(Pos.CENTER_LEFT);
         buttonPanel.setSpacing(3.0);
@@ -191,7 +192,17 @@ public class PlayerView extends Tab implements ViewObserver {
                 }
 
 
+                if (player.board.getPhase() == Phase.ACTIVATION) {
+                    for (int i = 0; i < Player.NO_REGISTERS; i++) {
+                        if (i == player.board.getStep()) {
+                            player.getProgramField(i).setActive(true);
+                        } else {
+                            player.getProgramField(i).setActive(false);
+                        }
+                    }
+                }
             } else {
+
                 if (!programPane.getChildren().contains(playerInteractionPanel)) {
                     programPane.getChildren().remove(buttonPanel);
                     programPane.add(playerInteractionPanel, Player.NO_REGISTERS, 0);
@@ -227,12 +238,12 @@ public class PlayerView extends Tab implements ViewObserver {
                     if (command.isInteractive()) {
                         for (Command option : command.getOptions()) {
                             Button optButton = new Button("Option1");
-                            optButton.setOnAction( e -> gameController.notImplemented());
+                            optButton.setOnAction( e -> gameController.executePlayerActions(player, option));
                             optButton.setDisable(false);
                             playerInteractionPanel.getChildren().add(optButton);
 
                             optButton = new Button("Option 2");
-                            optButton.setOnAction( e -> gameController.notImplemented());
+                            optButton.setOnAction( e -> gameController.executePlayerActions(player, option));
                             optButton.setDisable(false);
                             playerInteractionPanel.getChildren().add(optButton);
                         }

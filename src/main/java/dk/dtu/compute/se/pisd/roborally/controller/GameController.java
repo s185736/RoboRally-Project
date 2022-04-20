@@ -125,11 +125,18 @@ public class GameController {
         }
     }
 
-    // XXX: V2
     public void executePrograms() {
         board.setStepMode(false);
         continuePrograms();
     }
+
+    /*public void executePrograms() {
+        board.setStepMode(false);
+        while (board.getPhase() == Phase.ACTIVATION) {
+            continuePrograms();
+        }
+    }*/
+
 
     // XXX: V2
     public void executeStep() {
@@ -137,22 +144,23 @@ public class GameController {
         continuePrograms();
     }
 
+
     // XXX: V2
     private void continuePrograms() {
         do {
-            executeNextStep();
+            executeNextStep(null);
         } while (board.getPhase() == Phase.ACTIVATION && !board.isStepMode());
     }
 
     // XXX: V2
-    private void executeNextStep() {
+    private void executeNextStep(Command command) {
         Player currentPlayer = board.getCurrentPlayer();
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
             int step = board.getStep();
             if (step >= 0 && step < Player.NO_REGISTERS) {
                 CommandCard card = currentPlayer.getProgramField(step).getCard();
                 if (card != null) {
-                    Command command = card.command;
+                    command = card.command;
                     executeCommand(currentPlayer, command);
                 } else {
                     executeCommandOptionAndContinue(currentPlayer, currentPlayer.getProgramField(step).getCard());
@@ -186,26 +194,68 @@ public class GameController {
             // XXX This is a very simplistic way of dealing with some basic cards and
             //     their execution. This should eventually be done in a more elegant way
             //     (this concerns the way cards are modelled as well as the way they are executed).
-
-            switch (command) {
-                case FORWARD:
-                    this.moveForward(player);
-                    break;
-                case RIGHT:
-                    this.turnRight(player);
-                    break;
-                case LEFT:
-                    this.turnLeft(player);
-                    break;
-                case FAST_FORWARD:
-                    this.fastForward(player);
-                    break;
-                default:
-                    // DO NOTHING (for now)
+            if (command.isInteractive()) {
+                board.setPhase(Phase.PLAYER_INTERACTION);
+            } else {
+                switch (command) {
+                    case FORWARD:
+                        this.moveForward(player);
+                        break;
+                    case RIGHT:
+                        this.turnRight(player);
+                        break;
+                    case LEFT:
+                        this.turnLeft(player);
+                        break;
+                    case FAST_FORWARD:
+                        this.fastForward(player);
+                        break;
+                    default:
+                        // DO NOTHING (for now)
+                }
             }
         }
     }
 
+    /**
+     * Replaced with notImplemented, this will execute the option of the players.
+     *
+     * @param player
+     * @param option
+     */
+    public void executePlayerActions(Player player, Command option) {
+        if (player != null && player.board == board && board.getCurrentPlayer() == player) {
+            board.setPhase(Phase.ACTIVATION);
+            execute(option);
+        }
+    }
+
+    /**
+     * Executing the program...
+     *
+     * @param command
+     */
+    private void execute(Command command) {
+        executeNextStep(command);
+            executePrograms();
+    }
+
+ /*private void execute(Command command) {
+        executeNextStep(command);
+        if (board.getPhase() == Phase.ACTIVATION && !board.isStepMode()) {
+            executePrograms();
+        }
+    }*/
+
+    /**
+     *
+     * This method should then switch the game back to the ACTIVATION phase, execute the selected option for the current player,
+     * and then switch the execution of the robots ' program to the next program card
+     *
+     * status: in progress
+     * @param player
+     * @param card
+     */
     private void executeCommandOptionAndContinue(@NotNull Player player, CommandCard card) {
         if (card == null) {
             return;
@@ -216,16 +266,72 @@ public class GameController {
     // TODO: V2
     public void moveForward(@NotNull Player player) {
         Space space = player.getSpace();
+        int update_cordX,update_cordY;
+        /*The positions will be updated and set as update_pos.*/
         if (player != null && player.board == board && space != null) {
-            Heading heading = player.getHeading();
-            Space target = board.getNeighbour(space, heading);
-            if (target != null) {
-                // XXX note that this removes an other player from the space, when there
-                //     is another player on the target. Eventually, this needs to be
-                //     implemented in a way so that other players are pushed away!
-                target.setPlayer(player);
+            int x = space.x;
+            int y = space.y;
+
+            if (player.getSpace().get_NBR_Space(player.getHeading()).getPlayer() == null) {
+            } else {
+                Player nbr_player = player.getSpace().get_NBR_Space(player.getHeading()).getPlayer();
+                moveForwardHeading(nbr_player, player.getHeading());
+            }
+            if (!player.getSpace().get_NBR_Space(player.getHeading()).getWalls().contains(player.getHeading().oppos())) {
+                if (player.getSpace().getWalls().contains(player.getHeading())) {
+                    return;
+                }
+                update_cordX = 0;
+                update_cordY = 0;
+
+                switch (player.getHeading()) {
+                    case NORTH -> {
+                        update_cordX = x;
+                        update_cordY = (y - 1) % board.height;
+                        if (update_cordY != -1) {
+                        } else {
+                            update_cordY = 7;
+                        }
+                    }
+                    case SOUTH -> {
+                        update_cordX = x;
+                        update_cordY = (y + 1) % board.height;
+                    }
+                    case WEST -> {
+                        update_cordX = (x - 1) % board.width;
+                        if (update_cordX != -1) {
+                        } else {
+                            update_cordX = 7;
+                        }
+                        update_cordY = y;
+                    }
+                    case EAST -> {
+                        update_cordX = (x + 1) % board.width;
+                        update_cordY = y;
+                    }
+                }
+                /*if no updates in the current position... then it will set the new position as current position.*/
+                Space updated_pos;
+                updated_pos = board.getSpace(update_cordX, update_cordY);
+                if (updated_pos == null || updated_pos.getPlayer() != null || updated_pos == space) {
+                    return;
+                }
+                updated_pos.setPlayer(player);
+            } else {
+                return;
             }
         }
+    }
+
+    /**
+     * @param player
+     * @param heading
+     */
+    public void moveForwardHeading(@NotNull Player player, Heading heading) {
+        Heading prev_heading = player.getHeading();
+        player.setHeading(heading);
+        moveForward(player);
+        player.setHeading(prev_heading);
     }
 
     // TODO: V2
@@ -268,7 +374,4 @@ public class GameController {
         // XXX just for now to indicate that the actual method is not yet implemented
         assert false;
     }
-
-
-
 }
