@@ -1,0 +1,66 @@
+{
+  "x": 8, "y": 8, "ant_x": 5, "ant_y": 2,
+  "splay": [{
+    "playerNo": 0,
+    "x": 1,
+    "y": 5,
+    "walls": [],
+    "actions": [{
+      "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.CheckPoint",
+      "DETAIL": {"no": 2}
+        }
+      ]
+    },
+    {
+      "playerNo": 0, "x": 2, "y": 3, "walls": [],
+      "actions": [{
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.CheckPoint",
+        "DETAIL": {"no": 1}
+        }
+      ]
+    },
+    {
+      "playerNo": 2, "x": 3, "y": 1,
+      "walls": ["EAST"],
+      "actions": []
+    },
+    {
+      "playerNo": 0, "x": 3, "y": 5, "walls": [],
+      "actions": [{
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Conveyor",
+        "DETAIL": {"heading": "EAST"}
+        }
+      ]
+    },
+    {
+      "playerNo": 0, "x": 4, "y": 4, "walls": [],
+      "actions": [{
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Gear",
+        "DETAIL": {
+          "coord": "LEFT"
+        }
+        }
+      ]
+    },
+    {
+      "playerNo": 0, "x": 4, "y": 5, "walls": [],
+      "actions": [{
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Conveyor",
+        "DETAIL": {"heading": "NORTH"}
+        }
+      ]
+    },
+    {
+      "playerNo": 0, "x": 6, "y": 6, "walls" : [],
+      "actions" : [{
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Pit",
+        "DETAIL": {}
+      }]
+    },
+    {
+      "playerNo": 1, "x": 5, "y": 4,
+      "walls": ["WEST"],
+      "actions": []
+    }
+  ]
+}
