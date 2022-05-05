@@ -28,7 +28,7 @@ import javafx.scene.control.MenuItem;
 
 /**
  * ...
- *
+ * Using menuBar instead (for now)..
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */
@@ -40,7 +40,7 @@ public class RoboRallyMenuBar extends MenuBar {
 
     private MenuItem saveGame;
 
-    private MenuItem newGame;
+    private MenuItem startNewGame;
 
     private MenuItem loadGame;
 
@@ -54,13 +54,9 @@ public class RoboRallyMenuBar extends MenuBar {
         controlMenu = new Menu("File");
         this.getMenus().add(controlMenu);
 
-        newGame = new MenuItem("New Game");
-        newGame.setOnAction( e -> this.appController.newGame());
-        controlMenu.getItems().add(newGame);
-
-        stopGame = new MenuItem("Stop Game");
-        stopGame.setOnAction( e -> this.appController.stopGame());
-        controlMenu.getItems().add(stopGame);
+        startNewGame = new MenuItem("New Game");
+        startNewGame.setOnAction(e -> this.appController.newGame());
+        controlMenu.getItems().add(startNewGame);
 
         saveGame = new MenuItem("Save Game");
         saveGame.setOnAction( e -> this.appController.saveGame());
@@ -81,16 +77,17 @@ public class RoboRallyMenuBar extends MenuBar {
 
     public void update() {
         if (appController.isGameRunning()) {
-            newGame.setVisible(false);
+            startNewGame.setVisible(false);
             stopGame.setVisible(true);
             saveGame.setVisible(true);
             loadGame.setVisible(false);
         } else {
-            newGame.setVisible(true);
+            startNewGame.setVisible(true);
             stopGame.setVisible(false);
             saveGame.setVisible(false);
             loadGame.setVisible(true);
         }
     }
+
 
 }

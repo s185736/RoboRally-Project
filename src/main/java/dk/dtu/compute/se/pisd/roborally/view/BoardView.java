@@ -23,16 +23,17 @@ package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
-import dk.dtu.compute.se.pisd.roborally.model.Board;
-import dk.dtu.compute.se.pisd.roborally.model.Phase;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import org.jetbrains.annotations.NotNull;
+
+import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
+import dk.dtu.compute.se.pisd.roborally.model.Phase;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
+
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * ...
@@ -51,9 +52,11 @@ public class BoardView extends VBox implements ViewObserver {
 
     private Label statusLabel;
 
-    private SpaceEventHandler spaceEventHandler;
+    private GameController gameController;
+//    private SpaceEventHandler spaceEventHandler;
 
     public BoardView(@NotNull GameController gameController) {
+        this.gameController = gameController;
         board = gameController.board;
 
         mainBoardPane = new GridPane();
@@ -65,8 +68,7 @@ public class BoardView extends VBox implements ViewObserver {
         this.getChildren().add(statusLabel);
 
         spaces = new SpaceView[board.width][board.height];
-
-        spaceEventHandler = new SpaceEventHandler(gameController);
+        //spaceEventHandler = new SpaceEventHandler(gameController);
 
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {
@@ -74,10 +76,9 @@ public class BoardView extends VBox implements ViewObserver {
                 SpaceView spaceView = new SpaceView(space);
                 spaces[x][y] = spaceView;
                 mainBoardPane.add(spaceView, x, y);
-                spaceView.setOnMouseClicked(spaceEventHandler);
+                //spaceView.setOnMouseClicked(spaceEventHandler);
             }
         }
-
         board.attach(this);
         update(board);
     }
@@ -86,10 +87,16 @@ public class BoardView extends VBox implements ViewObserver {
     public void updateView(Subject subject) {
         if (subject == board) {
             Phase phase = board.getPhase();
-            statusLabel.setText(board.getStatusMessage());
+            String ss = "";
+            ss = "Phase: " + phase.name();
+            ss = switch (phase) {
+                case ACTIVATION -> ss + ", register = " + board.getStep() + ", player = " + board.getCurrentPlayer().getName();
+                case PLAYER_INTERACTION -> ss + ", player = " + board.getCurrentPlayer().getName();
+                default -> ss;
+            };
+            statusLabel.setText(ss);
         }
     }
-
     // XXX this handler and its uses should eventually be deleted! This is just to help test the
     //     behaviour of the game by being able to explicitly move the players on the board!
     private class SpaceEventHandler implements EventHandler<MouseEvent> {

@@ -22,11 +22,13 @@
 package dk.dtu.compute.se.pisd.roborally;
 
 import dk.dtu.compute.se.pisd.roborally.controller.AppController;
-import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
-import dk.dtu.compute.se.pisd.roborally.view.RoboRallyMenuBar;
 import javafx.application.Application;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -39,13 +41,28 @@ import javafx.stage.Stage;
  */
 public class RoboRally extends Application {
 
+    /*private AppController appController;
+
+    private RoboRallyMenuBar menuBar;
+
+    private Menu controlMenu;
+
+    private MenuItem saveGame;
+
+    private MenuItem newGame;
+
+    private MenuItem loadGame;
+
+    private MenuItem stopGame;
+
+    private MenuItem exitApp;*/
+
     private static final int MIN_APP_WIDTH = 600;
 
+    private BoardView boardView = null;
     private Stage stage;
+    private MenuBar menuBar;
     private BorderPane boardRoot;
-    // private RoboRallyMenuBar menuBar;
-
-    // private AppController appController;
 
     @Override
     public void init() throws Exception {
@@ -54,31 +71,89 @@ public class RoboRally extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        stage = primaryStage;
+        this.stage = primaryStage;
 
         AppController appController = new AppController(this);
 
         // create the primary scene with the a menu bar and a pane for
         // the board view (which initially is empty); it will be filled
         // when the user creates a new game or loads a game
-        RoboRallyMenuBar menuBar = new RoboRallyMenuBar(appController);
+        MenuBar menuBar = createMenu(appController);
         boardRoot = new BorderPane();
-        VBox vbox = new VBox(menuBar, boardRoot);
+        VBox vbox = new VBox(menuBar);
         vbox.setMinWidth(MIN_APP_WIDTH);
-        Scene primaryScene = new Scene(vbox);
+        Scene primaryScene = new Scene(boardRoot);
 
         stage.setScene(primaryScene);
-        stage.setTitle("RoboRally");
-        stage.setOnCloseRequest(
+        primaryStage.setTitle("Roborally");
+        primaryStage.setOnCloseRequest(
                 e -> {
                     e.consume();
                     appController.exit();} );
-        stage.setResizable(false);
-        stage.sizeToScene();
-        stage.show();
+        boardRoot.setTop(menuBar);
+        primaryStage.setResizable(false);
+        primaryStage.sizeToScene();
+        primaryStage.show();
     }
 
-    public void createBoardView(GameController gameController) {
+    private MenuBar createMenu(AppController appController) {
+
+        menuBar = new MenuBar();
+        Menu menu = new Menu("File");
+
+        MenuItem item1 = new MenuItem("New Game");
+        item1.setOnAction(e -> {
+            this.boardView = appController.newGame();
+
+            Scene scene = this.stage.getScene();
+            Parent root = scene.getRoot();
+            ((BorderPane) root).setCenter(this.boardView);
+
+
+            stage.sizeToScene();
+            stage.centerOnScreen();
+
+            appController.startGame();
+
+        });
+
+
+        MenuItem item2 = new MenuItem("Stop Game");
+        item2.setOnAction(e -> {
+            appController.stopGame();
+        });
+
+        MenuItem item3 = new MenuItem("Save Game");
+        item3.setOnAction(e -> {
+            appController.saveGame();
+        });
+
+        MenuItem item4 = new MenuItem("Load Game");
+        item4.setOnAction(e -> {
+            appController.loadGame();
+
+            Scene scene = this.stage.getScene();
+            Parent root = scene.getRoot();
+            ((BorderPane) root).setCenter(this.boardView);
+
+            stage.sizeToScene();
+            stage.centerOnScreen();
+        });
+
+
+        MenuItem item5 = new MenuItem("Exit");
+        item5.setOnAction(e -> {
+            appController.exit();
+
+        });
+
+        menu.getItems().addAll(item1, item2, item3, item4, item5);
+        menuBar.getMenus().add(menu);
+
+        return menuBar;
+    }
+
+   /* public void createBoardView(GameController gameController) {
         // if present, remove old BoardView
         boardRoot.getChildren().clear();
 
@@ -89,7 +164,7 @@ public class RoboRally extends Application {
         }
 
         stage.sizeToScene();
-    }
+    }*/
 
     @Override
     public void stop() throws Exception {
@@ -99,6 +174,8 @@ public class RoboRally extends Application {
         //     but right now the only way for the user to exit the app
         //     is delegated to the exit() method in the AppController,
         //     so that the AppController can take care of that.
+
+        System.exit(0);
     }
 
     public static void main(String[] args) {

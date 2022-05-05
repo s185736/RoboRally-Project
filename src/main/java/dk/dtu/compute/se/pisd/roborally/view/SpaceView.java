@@ -22,16 +22,19 @@
 package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
-import dk.dtu.compute.se.pisd.roborally.model.Heading;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
-import dk.dtu.compute.se.pisd.roborally.model.Space;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
+import dk.dtu.compute.se.pisd.roborally.model.*;
+import dk.dtu.compute.se.pisd.roborally.model.fieldAction.*;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
+import org.jetbrains.annotations.NotNull;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.image.ImageView;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.StrokeLineCap;
-import org.jetbrains.annotations.NotNull;
+
+import java.net.URISyntaxException;
+import java.util.Objects;
 
 /**
  * ...
@@ -41,8 +44,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SpaceView extends StackPane implements ViewObserver {
 
-    final public static int SPACE_HEIGHT = 60; // 60; // 75;
-    final public static int SPACE_WIDTH = 60;  // 60; // 75;
+    final public static int SPACE_HEIGHT = 60;
+    final public static int SPACE_WIDTH = 60;
 
     public final Space space;
 
@@ -65,15 +68,19 @@ public class SpaceView extends StackPane implements ViewObserver {
             this.setStyle("-fx-background-color: black;");
         }
 
-        // updatePlayer();
+        if (space.board.getAntenna() != null && (space.board.getAntenna().x == space.x && space.board.getAntenna().y == space.y)) {
+            this.setStyle("-fx-background-color: pink;");
+        }
+
+        // updatePlayer(); //doing it through updateView..
 
         // This space view should listen to changes of the space
         space.attach(this);
-        update(space);
+        updateView(this.space);
     }
 
     private void updatePlayer() {
-        this.getChildren().clear();
+        //this.getChildren().clear();
 
         Player player = space.getPlayer();
         if (player != null) {
@@ -91,11 +98,110 @@ public class SpaceView extends StackPane implements ViewObserver {
         }
     }
 
+    private void updateConveyor(){
+        Conveyor conB = space.getConveyorBelt();
+        if (conB != null) {
+            Polygon arrow = new Polygon(0.0, 0.0,
+                    60.0, 0.0,
+                    30.0, 60.0);
+            arrow.setFill(Color.LIGHTGRAY);
+            arrow.setRotate((90*conB.getHeading().ordinal())%360);
+            this.getChildren().add(arrow);
+        }
+    }
+
+    private void updateWalls(){
+        Space space = this.space;
+        if (space != null && !space.getWalls().isEmpty()) {
+            for (Heading headingWall : space.getWalls()) {
+                Polygon arrow = new Polygon(.0,0.0,
+                        70.0,0.0,
+                        70.0,5.0,
+                        0.0,5.0);
+
+                switch (headingWall) {
+                    case EAST -> {
+                        arrow.setTranslateX(32.5);
+                        arrow.setRotate((90 * headingWall.ordinal()) % 360);
+                    }
+                    case SOUTH -> arrow.setTranslateY(32.5);
+                    case WEST -> {
+                        arrow.setTranslateX(-32.5);
+                        arrow.setRotate((90 * headingWall.ordinal()) % 360);
+                    }
+                    case NORTH -> arrow.setTranslateY(-32.5);
+                }
+                arrow.setFill(Color.ORANGERED);
+                this.getChildren().add(arrow);
+            }
+        }
+    }
+
     @Override
     public void updateView(Subject subject) {
         if (subject == this.space) {
+            this.getChildren().clear();
+            updateConveyor();
+            this.setStyle(space.board.getAntenna() == null || (space.board.getAntenna().x != space.x || space.board.getAntenna().y != space.y) ? (space.x + space.y) % 2 == 0 ? "-fx-background-color: white;" : "-fx-background-color: black;" : "-fx-background-color: #ffffff;");
+            if (space.getStartingPlayerNo() <= 0) {
+            } else {
+                Image icons = null;
+                try {
+                    icons = new Image(Objects.requireNonNull(SpaceView.class.getClassLoader().getResource("icons/img/sp.png")).toURI().toString());
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
+                }
+                ImageView imgView = new ImageView(icons);
+                imgView.setImage(icons);
+                imgView.setRotate(-90);
+                imgView.setFitHeight(SPACE_HEIGHT);
+                imgView.setFitWidth(SPACE_WIDTH);
+                imgView.setVisible(true);
+                this.getChildren().add(imgView);
+            }
+
+            space.actions.forEach(action -> {
+                if (!(action instanceof CheckPoint)) {
+                } else {
+                    implementImagesOnSpace("icons/img/cp.png", -90);
+                }
+                if (!(action instanceof Pit)) {
+                } else {
+                    implementImagesOnSpace("icons/img/pit.png");
+                }
+                if (!(action instanceof Gear)) {
+                    return;
+                }
+                implementImagesOnSpace("icons/img/gear.png");
+            });
+            updateWalls();
             updatePlayer();
         }
+    }
+
+    private ImageView implementImagesOnSpace(String string) {
+        Image image;
+        image = null;
+        try {
+            image = new Image(SpaceView.class.getClassLoader().getResource(string).toURI().toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        ImageView imageview;
+        imageview = new ImageView(image);
+        imageview.setImage(image);
+        imageview.setFitHeight(SPACE_HEIGHT);
+        imageview.setFitWidth(SPACE_WIDTH);
+        imageview.setVisible(true);
+
+        this.getChildren().add(imageview);
+        return imageview;
+    }
+
+    private ImageView implementImagesOnSpace(String name, double coordRotations) {
+        ImageView imageView = implementImagesOnSpace(name);
+        imageView.setRotate(coordRotations);
+        return imageView;
     }
 
 }

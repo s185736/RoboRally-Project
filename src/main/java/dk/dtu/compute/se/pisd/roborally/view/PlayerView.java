@@ -21,16 +21,21 @@
  */
 package dk.dtu.compute.se.pisd.roborally.view;
 
+
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import dk.dtu.compute.se.pisd.roborally.model.*;
+import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCard;
+import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCardField;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
+import org.jetbrains.annotations.NotNull;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * ...
@@ -42,6 +47,8 @@ public class PlayerView extends Tab implements ViewObserver {
 
     private Player player;
     public Label checkpointLabel;
+    public Label textLabel;
+    public Label lastCheckpointLabel;
 
     private VBox top;
 
@@ -87,25 +94,23 @@ public class PlayerView extends Tab implements ViewObserver {
             }
         }
 
-        // XXX  the following buttons should actually not be on the tabs of the individual
-        //      players, but on the PlayersView (view for all players). This should be
-        //      refactored.
-
+        // XXX the following buttons should actually not be on the tabs of the individual
+        //     players, but on the PlayersView (view for all players). This should be
+        //     refactored.
         finishButton = new Button("Finish Programming");
-        finishButton.setOnAction(e -> gameController.finishProgrammingPhase());
+        finishButton.setOnAction( e -> {gameController.finishProgrammingPhase();});
 
         executeButton = new Button("Execute Program");
-        executeButton.setOnAction(e -> gameController.executePrograms());
+        executeButton.setOnAction( e-> {gameController.executePrograms();});
 
         stepButton = new Button("Execute Current Register");
-        stepButton.setOnAction(e -> gameController.executeStep());
+        stepButton.setOnAction( e-> {gameController.executeStep();});
 
-        checkpointLabel = new Label("The Last Check Point: " + this.player.getLastCheckPoints());
+        lastCheckpointLabel = new Label("The Last Check Point: " + this.player.getLastCheckPoints());
 
-        buttonPanel = new VBox(finishButton, executeButton, stepButton, checkpointLabel);
+        buttonPanel = new VBox(finishButton, executeButton, stepButton, lastCheckpointLabel);
         buttonPanel.setAlignment(Pos.CENTER_LEFT);
         buttonPanel.setSpacing(3.0);
-        // programPane.add(buttonPanel, Player.NO_REGISTERS, 0); done in update now
 
         playerInteractionPanel = new VBox();
         playerInteractionPanel.setAlignment(Pos.CENTER_LEFT);
@@ -130,40 +135,22 @@ public class PlayerView extends Tab implements ViewObserver {
         top.getChildren().add(cardsPane);
 
         if (player.board != null) {
-            player.board.attach(this);
             update(player.board);
+            player.board.attach(this);
+            if (player != null)
+                player.attach(this);
+        } else {
+            if (player != null)
+                player.attach(this);
         }
     }
 
     @Override
     public void updateView(Subject subject) {
         if (subject == player) {
-            this.checkpointLabel.setText("The Last Check Point: " + ((Player) subject).getLastCheckPoints());
+            this.lastCheckpointLabel.setText("The Last Check Point: " + ((Player) subject).getLastCheckPoints());
         }
         if (subject == player.board) {
-            for (int i = 0; i < Player.NO_REGISTERS; i++) {
-                CardFieldView cardFieldView = programCardViews[i];
-                if (cardFieldView != null) {
-                    if (player.board.getPhase() == Phase.PROGRAMMING) {
-                        cardFieldView.setBackground(CardFieldView.BG_DEFAULT);
-                    } else {
-                        if (i < player.board.getStep()) {
-                            cardFieldView.setBackground(CardFieldView.BG_DONE);
-                        } else if (i == player.board.getStep()) {
-                            if (player.board.getCurrentPlayer() == player) {
-                                cardFieldView.setBackground(CardFieldView.BG_ACTIVE);
-                            } else if (player.board.getPlayerNumber(player.board.getCurrentPlayer()) > player.board.getPlayerNumber(player)) {
-                                cardFieldView.setBackground(CardFieldView.BG_DONE);
-                            } else {
-                                cardFieldView.setBackground(CardFieldView.BG_DEFAULT);
-                            }
-                        } else {
-                            cardFieldView.setBackground(CardFieldView.BG_DEFAULT);
-                        }
-                    }
-                }
-            }
-
             if (player.board.getPhase() != Phase.PLAYER_INTERACTION) {
                 if (!programPane.getChildren().contains(buttonPanel)) {
                     programPane.getChildren().remove(playerInteractionPanel);
@@ -196,7 +183,6 @@ public class PlayerView extends Tab implements ViewObserver {
                         stepButton.setDisable(true);
                 }
 
-
                 if (player.board.getPhase() == Phase.ACTIVATION) {
                     for (int i = 0; i < Player.NO_REGISTERS; i++) {
                         if (i == player.board.getStep()) {
@@ -206,15 +192,16 @@ public class PlayerView extends Tab implements ViewObserver {
                         }
                     }
                 }
-            } else {
 
+
+            } else {
                 if (!programPane.getChildren().contains(playerInteractionPanel)) {
                     programPane.getChildren().remove(buttonPanel);
                     programPane.add(playerInteractionPanel, Player.NO_REGISTERS, 0);
                 }
                 playerInteractionPanel.getChildren().clear();
 
-               /* if (player.board.getCurrentPlayer() == player) {
+                  /* if (player.board.getCurrentPlayer() == player) {
                     // TODO Assignment p3: these buttons should be shown only when there is
                     //      an interactive command card, and the buttons should represent
                     //      the player's choices of the interactive command card. The
@@ -230,6 +217,7 @@ public class PlayerView extends Tab implements ViewObserver {
                     optionButton.setDisable(false);
                     playerInteractionPanel.getChildren().add(optionButton);
                 }*/
+
                 if (player.board.getCurrentPlayer() == player) {
                     CommandCardField field = player.getProgramField(player.board.getStep());
                     if (field == null) {
@@ -241,8 +229,8 @@ public class PlayerView extends Tab implements ViewObserver {
                     }
                     Command command = card.command;
                     if (command.isInteractive()) {
-                        for (Command option : command.getOptions()) {
-                            Button optButton = new Button("Option1");
+                        for (Command command1 : command.getOptions()) {
+                        /*  Button optButton = new Button("Option1");
                             optButton.setOnAction( e -> gameController.executePlayerActions(player, option));
                             optButton.setDisable(false);
                             playerInteractionPanel.getChildren().add(optButton);
@@ -251,11 +239,20 @@ public class PlayerView extends Tab implements ViewObserver {
                             optButton.setOnAction( e -> gameController.executePlayerActions(player, option));
                             optButton.setDisable(false);
                             playerInteractionPanel.getChildren().add(optButton);
+                         */
+                            /*got the left or right option to work.*/
+                            Button button = new Button(command1.displayName);
+                            button.setOnAction(e -> {gameController.executePlayerActions(player, command1);});
+                            playerInteractionPanel.getChildren().add(button);
                         }
-
                     }
                 }
             }
         }
+    }
+
+    public Player getPlayer() {
+        return player;
+
     }
 }

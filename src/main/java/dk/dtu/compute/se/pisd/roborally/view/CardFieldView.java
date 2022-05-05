@@ -23,10 +23,11 @@ package dk.dtu.compute.se.pisd.roborally.view;
 
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
-import dk.dtu.compute.se.pisd.roborally.model.CommandCard;
-import dk.dtu.compute.se.pisd.roborally.model.CommandCardField;
+import org.jetbrains.annotations.NotNull;
+import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCard;
+import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCardField;
 import dk.dtu.compute.se.pisd.roborally.model.Phase;
-import dk.dtu.compute.se.pisd.roborally.model.Player;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -35,7 +36,6 @@ import javafx.scene.image.Image;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * ...
@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class CardFieldView extends GridPane implements ViewObserver {
 
-    // This data format helps avoiding transfers of e.g. Strings from other
+    // This dataformat helps avoiding transfers of e.g. Strings from other
     // programs which can copy/paste Strings.
     final public static  DataFormat ROBO_RALLY_CARD = new DataFormat("games/roborally/cards");
 
@@ -59,7 +59,8 @@ public class CardFieldView extends GridPane implements ViewObserver {
     final public static Background BG_DROP = new Background(new BackgroundFill(Color.LIGHTGRAY, null, null));
 
     final public static Background BG_ACTIVE = new Background(new BackgroundFill(Color.YELLOW, null, null));
-    final public static Background BG_DONE = new Background(new BackgroundFill(Color.GREENYELLOW,  null, null));
+    //final public static Background BG_DONE = new Background(new BackgroundFill(Color.GREENYELLOW,  null, null));
+    //final public static Background BG_HIDDEN = new Background(new BackgroundFill(Color.BLACK,  null, null));
 
     private CommandCardField field;
 
@@ -149,6 +150,13 @@ public class CardFieldView extends GridPane implements ViewObserver {
             } else {
                 label.setText("");
             }
+            if (subject == this.field) {
+                if (field.isActive()) {
+                    this.setBackground(BG_ACTIVE);
+                } else {
+                    this.setBackground(BG_DEFAULT);
+                }
+            }
         }
     }
 
@@ -178,7 +186,6 @@ public class CardFieldView extends GridPane implements ViewObserver {
             }
             event.consume();
         }
-
     }
 
     private class OnDragOverHandler implements EventHandler<DragEvent> {
@@ -200,7 +207,6 @@ public class CardFieldView extends GridPane implements ViewObserver {
             }
             event.consume();
         }
-
     }
 
     private class OnDragEnteredHandler implements EventHandler<DragEvent> {
@@ -223,7 +229,6 @@ public class CardFieldView extends GridPane implements ViewObserver {
             }
             event.consume();
         }
-
     }
 
     private class OnDragExitedHandler implements EventHandler<DragEvent> {
@@ -246,7 +251,6 @@ public class CardFieldView extends GridPane implements ViewObserver {
             }
             event.consume();
         }
-
     }
 
     private class OnDragDroppedHandler implements EventHandler<DragEvent> {
@@ -301,9 +305,4 @@ public class CardFieldView extends GridPane implements ViewObserver {
         }
 
     }
-
 }
-
-
-
-
