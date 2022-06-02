@@ -27,7 +27,7 @@
     {
       "playerNo": 0, "x": 3, "y": 5, "walls": [],
       "actions": [{
-        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Conveyor",
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.ConveyorBelt",
         "DETAIL": {"heading": "EAST"}
         }
       ]
@@ -45,7 +45,7 @@
     {
       "playerNo": 0, "x": 4, "y": 5, "walls": [],
       "actions": [{
-        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Conveyor",
+        "CLASS_DIRECTORY": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.ConveyorBelt",
         "DETAIL": {"heading": "NORTH"}
         }
       ]

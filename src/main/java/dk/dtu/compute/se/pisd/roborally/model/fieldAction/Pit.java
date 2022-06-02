@@ -11,7 +11,7 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
  * @author
  *
  */
-public class Pit implements FieldAction {
+public class Pit extends FieldAction {
 
     @Override
     public boolean doAction(GameController gameController, Space space) {

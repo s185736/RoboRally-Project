@@ -11,7 +11,7 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
  * @author
  *
  */
-public class Gear implements FieldAction {
+public class Gear extends FieldAction {
 
     public Coordination coord;
 

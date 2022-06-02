@@ -10,7 +10,7 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
  * @author
  *
  */
-public class CheckPoint implements FieldAction {
+public class CheckPoint extends FieldAction {
 
    public final int no;
 

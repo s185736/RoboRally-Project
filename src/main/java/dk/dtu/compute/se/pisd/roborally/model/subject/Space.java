@@ -25,7 +25,7 @@ import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.model.Coordination;
 import dk.dtu.compute.se.pisd.roborally.model.Heading;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.CheckPoint;
-import dk.dtu.compute.se.pisd.roborally.model.fieldAction.Conveyor;
+import dk.dtu.compute.se.pisd.roborally.model.fieldAction.ConveyorBelt;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.Gear;
 import org.jetbrains.annotations.NotNull;
@@ -171,8 +171,7 @@ public class Space extends Subject {
      */
     public void addAction(FieldAction action) {
         this.actions.add(action);
-        if (!(action instanceof CheckPoint)) {
-        } else {
+        if (action instanceof CheckPoint) {
             this.board.setCheckpoint((CheckPoint) action);
         }
         notifyChange();
@@ -197,12 +196,12 @@ public class Space extends Subject {
     /**
      * @return
      */
-    public Conveyor getConveyorBelt() {
-        Conveyor convoy = null;
+    public ConveyorBelt getConveyorBelt() {
+        ConveyorBelt convoy = null;
         List<FieldAction> fieldActions = this.actions;
         for (int i = 0; i < fieldActions.size(); i++) {
             FieldAction action = fieldActions.get(i);
-            if (action instanceof Conveyor && convoy == null) convoy = (Conveyor) action;
+            if (action instanceof ConveyorBelt && convoy == null) convoy = (ConveyorBelt) action;
         }
         return convoy;
     }

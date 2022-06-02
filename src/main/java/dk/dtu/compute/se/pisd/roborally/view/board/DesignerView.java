@@ -126,7 +126,7 @@ public class DesignerView extends VBox {
             List<FieldAction> actions = space.getActions();
             for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
                 FieldAction action = actions.get(i);
-                if (!(action instanceof Conveyor)) {
+                if (!(action instanceof ConveyorBelt)) {
                     continue;
                 }
                 showAlertMessage("A Conveyor Belt " + stringMessage);
@@ -141,7 +141,7 @@ public class DesignerView extends VBox {
 
             choiceD.showAndWait();
             if (choiceD.getSelectedItem() != null) {
-                Conveyor conB = new Conveyor();
+                ConveyorBelt conB = new ConveyorBelt();
                 conB.setHeading((Heading) choiceD.getSelectedItem());
                 space.addAction(conB);
             } else {

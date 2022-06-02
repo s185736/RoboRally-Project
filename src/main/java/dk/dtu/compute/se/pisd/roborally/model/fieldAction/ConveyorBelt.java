@@ -21,9 +21,11 @@
  */
 package dk.dtu.compute.se.pisd.roborally.model.fieldAction;
 
-
 import dk.dtu.compute.se.pisd.roborally.controller.GameController;
+import dk.dtu.compute.se.pisd.roborally.model.Heading;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * ...
@@ -31,16 +33,30 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */
-public abstract class FieldAction {
 
-    /**
-     * Executes the field action for a given space. In order to be able to do
-     * that the GameController associated with the game is passed to this method.
-     *
-     * @param gameController the gameController of the respective game
-     * @param space the space this action should be executed for
-     * @return whether the action was successfully executed
-     */
-    public abstract boolean doAction(GameController gameController, Space space);
+public class ConveyorBelt extends FieldAction {
 
+    private Heading heading;
+
+    public Heading getHeading() {
+        return heading;
+    }
+
+    public void setHeading(Heading heading) {
+        this.heading = heading;
+    }
+
+    @Override
+    public boolean doAction(@NotNull GameController gameController, @NotNull Space space) {
+        Player currentPlayer = space.getPlayer();
+        Space neighbourSpace = space.get_NBR_Space(this.heading);
+        currentPlayer.setHeading(this.heading);
+        if (neighbourSpace.getPlayer() == null) {
+            currentPlayer.setSpace(neighbourSpace);
+            neighbourSpace.actions.stream().filter(action -> action instanceof ConveyorBelt && ((ConveyorBelt) action).getHeading() != this.heading.oppos()).forEach(action -> action.doAction(gameController, currentPlayer.getSpace()));
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
