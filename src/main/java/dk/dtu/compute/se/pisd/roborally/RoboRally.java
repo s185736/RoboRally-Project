@@ -138,6 +138,9 @@ public class RoboRally extends Application {
 
             stage.sizeToScene();
             stage.centerOnScreen();
+
+            //Implementering af load game
+            appController.startGame();
         });
 
 
