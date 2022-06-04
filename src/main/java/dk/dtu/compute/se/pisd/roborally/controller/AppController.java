@@ -31,6 +31,7 @@ import dk.dtu.compute.se.pisd.roborally.gameLoader.GameLoader;
 import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
 import dk.dtu.compute.se.pisd.roborally.view.board.BoardLayout;
 import javafx.application.Platform;
@@ -40,10 +41,7 @@ import javafx.scene.control.ChoiceDialog;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -247,7 +245,37 @@ public class AppController implements Observer {
     }
 
     public void saveGame() {
+
         // XXX needs to be implemented eventually
+        // https://attacomsian.com/blog/gson-write-json-file
+
+        //Creating player instance
+        Player p1 = new Player(new Board(10,4), "black", "test");
+        //User u1 =  new User("testName", 51);
+        try {   
+            Map<String, Object> map = new HashMap<>();
+            map.put("name", "John Deo");
+            map.put("email", "john.doe@example.com");
+            map.put("roles", new String[]{"Member", "Admin"});
+            map.put("admin", true);
+
+
+            //Creating a Gson instance
+            Gson gson = new Gson();
+            //Creating a writer
+            Writer writer = new FileWriter("saveFile.json");
+
+
+
+            //Convert object to JSON file
+            gson.toJson(map, writer);
+
+            //Closing the writer
+            writer.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startGame() {
