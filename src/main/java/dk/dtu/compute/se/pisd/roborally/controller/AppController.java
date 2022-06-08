@@ -22,11 +22,12 @@
 package dk.dtu.compute.se.pisd.roborally.controller;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
+import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
 import dk.dtu.compute.se.pisd.roborally.gameLoader.GameLoader;
 import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
@@ -38,14 +39,14 @@ import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.TextInputDialog;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.ParseException;
 import java.util.*;
 
+import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.loadBoard;
+import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.saveBoard;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -64,6 +65,7 @@ public class AppController implements Observer {
     private Board board = null;
     private BoardView boardView;
     private int chosenNumberOfPlayers = 0;
+    private Repo repo;
 
     /**
      * @param roboRally
@@ -252,83 +254,71 @@ public class AppController implements Observer {
         // XXX needs to be implemented eventually
 
         //implementering af save game
+
+
         // https://attacomsian.com/blog/gson-write-json-file
+        //LoadBoard gameSaver = new LoadBoard();
 
-        //Creating player instance
-        Player p1 = new Player(new Board(10,4), "black", "test");
-        //User u1 =  new User("testName", 51);
-        try {
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("NumberOfPlayers", board.getNumberOfPlayers());
-
-            //Creating a Gson instance
-            Gson gson = new Gson();
-
-            //Creating a writer
-            Writer writer = new FileWriter("saveFile.json");
-
-            //Convert object to JSON file
-            gson.toJson(map, writer);
-
-            //Closing the writer
-            writer.close();
+        saveBoard(this.board, "defaultboard");
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (gameController.board.getGameId() == null){
+            TextInputDialog text = new TextInputDialog("Name of the game");
+            /* skal omskrives
+            text.setTitle("Chose name for save");
+            text.setHeaderText("Name your saved game");
+            text.setContentText("Please enter game name:");
+            Optional<String> result = dialog.showAndWait();
+
+             */
+
+
         }
+
+        if (gameController.board.getGameId() == null) {
+            TextInputDialog dialog = new TextInputDialog("Game name");
+            dialog.setTitle("Chose name for save");
+            dialog.setHeaderText("Name your saved game");
+            dialog.setContentText("Please enter game name:");
+            Optional<String> result = dialog.showAndWait();
+            gameController.board.setGameName(result.get());
+            if(result.isPresent()) {
+                RepositoryAccess.getRepository().createGameInDB(gameController.board);
+                System.out.println("Game saved in DB");
+            }
+        } else {
+            RepositoryAccess.getRepository().updateGameInDB(gameController.board);
+            System.out.println("Game updated in DB");
+        }
+
     }
 
     public void startGame() {
         this.gameController.startProgrammingPhase();
     }
 
-    public void loadGame() {
+    public void loadGame(Integer id) {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
 
-        //implementering af load game
-        try{
+        if(id == null) {
+            this.board = loadBoard("defaultboard");
+        } else this.board = this.repo.loadGame(id);
 
-            //Creating a Gson instance
-            Gson gson = new Gson();
+        gameController = new GameController(board);
+        System.out.println("game is loaded");
 
-            // create a reader
-            Reader reader = Files.newBufferedReader(Paths.get("saveFile.json"));
-
-            // convert JSON file to map
-            Map<?, ?> map = gson.fromJson(reader, Map.class);
-
-            int temp = (int) map.get("NumberOfPlayers");
-
-            /*
-            int playerNumber = (temp + 1) % temp;
-            board.setCurrentPlayer(board.getPlayer(playerNumber));
-            board.getCurrentPlayer().setName("de");
-
-             */
-
-            // close reader
-            reader.close();
-
-            this.gameController.createPlayers(temp);
-
-
-
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        int numberOfPlayers = this.board.getNumberOfPlayers();
+        for (int i = 0; i < numberOfPlayers; i++){
+            Player p = this.board.getPlayer(i);
+            this.board.addPlayer(p);
+            p.setSpace(this.board.getPlayer(i).getSpace());
         }
-
-
-
-
-
 
         if (gameController == null) {
             newGame();
         }
+        else roboRally.createBoardView(gameController);
     }
 
     public boolean isGameRunning() {

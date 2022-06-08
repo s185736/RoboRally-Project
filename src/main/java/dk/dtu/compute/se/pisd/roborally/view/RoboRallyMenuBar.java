@@ -63,7 +63,7 @@ public class RoboRallyMenuBar extends MenuBar {
         controlMenu.getItems().add(saveGame);
 
         loadGame = new MenuItem("Load Game");
-        loadGame.setOnAction( e -> this.appController.loadGame());
+        loadGame.setOnAction( e -> this.appController.loadGame(e.getTarget()));
         controlMenu.getItems().add(loadGame);
 
         exitApp = new MenuItem("Exit");

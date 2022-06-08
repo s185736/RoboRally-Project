@@ -28,7 +28,9 @@ import dk.dtu.compute.se.pisd.roborally.model.fieldAction.CheckPoint;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import static dk.dtu.compute.se.pisd.roborally.model.Phase.INITIALISATION;
 
@@ -65,13 +67,18 @@ public  class Board extends Subject {
 
     public int change;
 
-    private String boardName;
+    public String boardName;
+
+    private String gameName;
+
+    private ListIterator<Player> playerIte;
 
     /**
      * @param width
      * @param height
      */
-    public Board(int width, int height) {
+    public Board(int width, int height, @NotNull String boardName) {
+        this.boardName = boardName;
         this.width = width;
         this.height = height;
         spaces = new Space[width][height];
@@ -311,5 +318,27 @@ public  class Board extends Subject {
             this.count = count;
             notifyChange();
         }
+    }
+    public Iterator<Player> getPlayerIte(){
+        return playerIte;
+    }
+    public int getPlayersNumber() {
+        return players.size();
+    }
+
+    public int getPlayerNo(@NotNull Player p) {
+        if (p.board == this) {
+            return players.indexOf(p);
+        } else {
+            return -1;
+        }
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
     }
 }

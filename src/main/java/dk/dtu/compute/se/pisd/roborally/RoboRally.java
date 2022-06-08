@@ -22,7 +22,9 @@
 package dk.dtu.compute.se.pisd.roborally;
 
 import dk.dtu.compute.se.pisd.roborally.controller.AppController;
+import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
+import dk.dtu.compute.se.pisd.roborally.view.RoboRallyMenuBar;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -41,9 +43,9 @@ import javafx.stage.Stage;
  */
 public class RoboRally extends Application {
 
-    /*private AppController appController;
+    private AppController appController;
 
-    private RoboRallyMenuBar menuBar;
+    private RoboRallyMenuBar menubar;
 
     private Menu controlMenu;
 
@@ -55,7 +57,7 @@ public class RoboRally extends Application {
 
     private MenuItem stopGame;
 
-    private MenuItem exitApp;*/
+    private MenuItem exitApp;
 
     private static final int MIN_APP_WIDTH = 600;
 
@@ -130,7 +132,8 @@ public class RoboRally extends Application {
 
         MenuItem item4 = new MenuItem("Load Game");
         item4.setOnAction(e -> {
-            appController.loadGame();
+
+            appController.loadGame(null);
 
             Scene scene = this.stage.getScene();
             Parent root = scene.getRoot();
@@ -139,7 +142,7 @@ public class RoboRally extends Application {
             stage.sizeToScene();
             stage.centerOnScreen();
 
-            //Implementering af load game
+
             appController.startGame();
         });
 
@@ -156,7 +159,7 @@ public class RoboRally extends Application {
         return menuBar;
     }
 
-   /* public void createBoardView(GameController gameController) {
+   public void createBoardView(GameController gameController) {
         // if present, remove old BoardView
         boardRoot.getChildren().clear();
 
@@ -167,7 +170,7 @@ public class RoboRally extends Application {
         }
 
         stage.sizeToScene();
-    }*/
+    }
 
     @Override
     public void stop() throws Exception {

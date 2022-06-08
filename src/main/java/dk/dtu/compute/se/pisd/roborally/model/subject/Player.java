@@ -85,6 +85,25 @@ public class Player extends Subject {
             cards[i] = new CommandCardField(this);
         }
     }
+    public Player(@NotNull Board board, String color, @NotNull String name, @NotNull Space space) {
+        playerCount++;
+
+        this.board = board;
+        this.name = name;
+        this.color = color;
+
+        this.space = space;
+
+        program = new CommandCardField[NO_REGISTERS];
+        for (int i = 0; i < program.length; i++) {
+            program[i] = new CommandCardField(this);
+        }
+
+        cards = new CommandCardField[NO_CARDS];
+        for (int i = 0; i < cards.length; i++) {
+            cards[i] = new CommandCardField(this);
+        }
+    }
 
     /**
      * @return
@@ -202,5 +221,12 @@ public class Player extends Subject {
      */
     public int getLastCheckPoints() {
         return checkpoint;
+    }
+    public CommandCardField[] getCards(){
+        return this.cards;
+    }
+
+    public CommandCardField[] getProgram() {
+        return program;
     }
 }
