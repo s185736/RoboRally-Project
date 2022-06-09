@@ -13,7 +13,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Repo{
+/**
+ *
+ * @author Ekkart Kindler, ekki@dtu.dk
+ */
+
+public class Repo {
 
     private final DatabaseConnector databaseConnector;
 
@@ -22,57 +27,52 @@ public class Repo{
     }
 
     /**
-     * Creates the game in connected database.
+     * Creating the game board in the database.
      *
-     * @author @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
-     * */
-    public boolean insertGame(Board game) {
-            Connection connection = databaseConnector.getDatabaseConnection();
+     * @param game
+     * @return
+     */
+    public boolean insertCreationGame(Board game) {
+            Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                connection.setAutoCommit(false);
-
-                PreparedStatement ps = connection.prepareStatement(
+                connDB.setAutoCommit(false);
+                PreparedStatement statement = connDB.prepareStatement(
                         "INSERT INTO Game(boardName, currentPlayer, phase, step, gameName) VALUES (?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, game.boardName);
-                ps.setNull(2, game.getCurrentPlayer().no); // game.getPlayerNumber(game.getCurrentPlayer())); is inserted after players!
-                ps.setInt(3, game.getPhase().ordinal());
-                ps.setInt(4, game.getStep());
-                ps.setString(5, game.getGameName());
+                statement.setString(1, game.boardName);
+                statement.setNull(2, game.getCurrentPlayer().no); // game.getPlayerNumber(game.getCurrentPlayer())); is inserted after players!
+                statement.setInt(3, game.getPhase().ordinal());
+                statement.setInt(4, game.getStep());
+                statement.setString(5, game.getGameName());
 
-                int affectedRows = ps.executeUpdate();
-                ResultSet generatedKeys = ps.getGeneratedKeys();
+                int affectedRows = statement.executeUpdate();
+                ResultSet generatedKeys = statement.getGeneratedKeys();
 
                 if (affectedRows == 1 && generatedKeys.next()) {
                     game.setGameId(generatedKeys.getInt(1));
                 }
                 generatedKeys.close();
-
                 insertPlayers(game);
-
                 createCardFields(game);
+                statement = getSelectGameStatementU();
+                statement.setInt(1, game.getGameId());
 
-                ps = getSelectGameStatementU();
-                ps.setInt(1, game.getGameId());
-
-                ResultSet rs = ps.executeQuery();
+                ResultSet rs = statement.executeQuery();
                 if (rs.next()) {
                     rs.updateInt("CurrentPlayer", game. getPlayerNo(game.getCurrentPlayer()));
                     rs.updateRow();
                 }
                 rs.close();
 
-                connection.commit();
-                connection.setAutoCommit(true);
+                connDB.commit();
+                connDB.setAutoCommit(true);
                 return true;
             } catch (SQLException e) {
                 e.printStackTrace();
-                System.err.println("Some DB error");
-
+                System.err.println("Error occured.");
                 try {
-                    connection.rollback();
-                    connection.setAutoCommit(true);
+                    connDB.rollback();
+                    connDB.setAutoCommit(true);
                 } catch (SQLException e1) {
                     e1.printStackTrace();
                 }
@@ -83,22 +83,19 @@ public class Repo{
     }
 
     /**
-     * Method responsible for updating the game in database.
+     * Updating the game board in the database.
      *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
-     * */
+     * @param game
+     * @return
+     */
     public boolean updateGame(Board game) {
         assert game.getGameId() != null;
-
-        Connection connection = databaseConnector.getDatabaseConnection();
+        Connection connDB = databaseConnector.getDatabaseConnection();
         try {
-            connection.setAutoCommit(false);
-
-            PreparedStatement ps = getSelectGameStatementU();
-            ps.setInt(1, game.getGameId());
-
-            ResultSet rs = ps.executeQuery();
+            connDB.setAutoCommit(false);
+            PreparedStatement statement = getSelectGameStatementU();
+            statement.setInt(1, game.getGameId());
+            ResultSet rs = statement.executeQuery();
             if (rs.next()) {
                 rs.updateInt("CurrentPlayer", game.getPlayerNo(game.getCurrentPlayer()));
                 rs.updateInt("Phase", game.getPhase().ordinal());
@@ -111,16 +108,16 @@ public class Repo{
             updatePlayersInDB(game);
             updateCardFields(game);
 
-            connection.commit();
-            connection.setAutoCommit(true);
+            connDB.commit();
+            connDB.setAutoCommit(true);
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Some DB error");
+            System.err.println("Error occured.");
 
             try {
-                connection.rollback();
-                connection.setAutoCommit(true);
+                connDB.rollback();
+                connDB.setAutoCommit(true);
             } catch (SQLException e1) {
                 e1.printStackTrace();
             }
@@ -130,78 +127,46 @@ public class Repo{
     }
 
     /**
-     * It updates the database with the current state of the game
+     * Updating the current state of the board game in the database.
      *
-     * @param game the game object
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
+     * @param game
+     * @throws SQLException
      */
-/*
-    PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM cardfield WHERE gameID = ?");
-            ps.setInt(1, game.getGameId());
-                    ps = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO cardfield (GameID, PlayerNo, isProgram, Active, Visible, Command) VALUES (?,?,?,?,?,?)");
-
-                    for (int i = 0; i < game.getPlayersNumber(); i++) {
-        Player player = game.getPlayer(i);
-        for (int j = 0; j < Player.NO_REGISTERS; j++) {
-        ps.setInt(1, game.getGameId());
-        ps.setInt(2, i);
-        ps.setInt(3, 1);
-        ps.setInt(4, player.getProgramField(j).isActive()? 1 : 0);
-        ps.setBoolean(5, player.getProgramField(j).isVisible());
-        if (player.getProgramField(j).getCard() != null) {
-        ps.setInt(6, player.getProgramField(j).getCard().command.ordinal());
-        } else {
-        ps.setNull(6,Types.INTEGER);
-        }
-        ps.execute();
-
-        Connection connection = databaseConnector.getDatabaseConnection();
-            try {
-                select_game_stmt = connection.prepareStatement(
-                        SQL_SELECT_GAME,
-                        ResultSet.TYPE_FORWARD_ONLY,
-                        ResultSet.CONCUR_UPDATABLE);
-
- */
     private void updateCardFields(Board game) throws SQLException {
-        PreparedStatement ps;
-        Connection connection = databaseConnector.getDatabaseConnection();
+        PreparedStatement statement;
+        Connection connDB = databaseConnector.getDatabaseConnection();
         try {
-            ps = connection.prepareStatement(
-                    "Select * from CardFieldCommands where GameID = ?",
+            statement = connDB.prepareStatement("Select * from CardFieldCommands where GameID = ?",
                     ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_UPDATABLE);
-            ps.setInt(1, game.getGameId());
-            ResultSet rs = ps.executeQuery();
+            statement.setInt(1, game.getGameId());
+            ResultSet rs = statement.executeQuery();
+
             while (rs.next()) {
                 int type = rs.getInt("IsProgram");
-                int position = rs.getInt("Position");
+                int pos = rs.getInt("Position");
                 int playerID = rs.getInt("PlayerNo");
-                CommandCardField commandCardField;
-                CommandCard commandCard;
+                CommandCardField cmdCardFld;
+                CommandCard cmdCard;
 
                 for (int i = 0; i < game.getPlayersNumber(); i++) {
                     Player player = game.getPlayer(i);
 
                     if (type == 0 && playerID == i) {
-                        commandCardField = player.getCardField(position);
-                        commandCard = commandCardField.getCard();
+                        cmdCardFld = player.getCardField(pos);
+                        cmdCard = cmdCardFld.getCard();
 
                     } else if (type == 1 && playerID == i) {
-                        commandCardField = player.getProgramField(position);
-                        commandCard = commandCardField.getCard();
+                        cmdCardFld = player.getProgramField(pos);
+                        cmdCard = cmdCardFld.getCard();
                     } else {
-                        commandCardField = null;
-                        commandCard = null;
+                        cmdCardFld = null;
+                        cmdCard = null;
                     }
-
-                    if (commandCardField != null) {
+                    if (cmdCardFld != null) {
                         rs.updateInt("Visible", 1);
-
-                        if (commandCard != null) {
-                            rs.updateInt("Command", commandCard.command.ordinal());
+                        if (cmdCard != null) {
+                            rs.updateInt("Command", cmdCard.command.ordinal());
                         } else {
                             rs.updateNull("Command");
                             rs.updateInt("Visible", 0);
@@ -217,72 +182,68 @@ public class Repo{
         }
     }
 
-    //@Override
     /**
-     * Method for loading game from the database
+     * Loading an existing board game through the database.
      *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
-     * */
+     * @param id
+     * @return
+     */
     public Board loadGame(int id) {
-        Board game;
+        Board boadGame;
         try {
-            PreparedStatement ps = getSelectGameStatementU();
+            PreparedStatement statement = getSelectGameStatementU();
             if (id == -1) {
-                id = getLatestSavedGameid();
+                id = getLatestSavedGameId();
             }
-            ps.setInt(1, id);
-
-            ResultSet rs = ps.executeQuery();
-            int playerNo = -1;
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            int playerNum = -1;
             if (rs.next()) {
-                game = LoadBoard.loadBoard(rs.getString(2));
-                if (game == null) {
+                boadGame = LoadBoard.loadBoard(rs.getString(2));
+                if (boadGame == null) {
                     return null;
                 }
-                playerNo = rs.getInt("CurrentPlayer");
-                game.setPhase(Phase.values()[rs.getInt("Phase")]);
-                game.setStep(rs.getInt("Step"));
+                playerNum = rs.getInt("CurrentPlayer");
+                boadGame.setPhase(Phase.values()[rs.getInt("Phase")]);
+                boadGame.setStep(rs.getInt("Step"));
 
             } else {
                 return null;
             }
             rs.close();
 
-            game.setGameId(id);
-            getPlayers(game);
+            boadGame.setGameId(id);
+            getPlayers(boadGame);
 
-            if (playerNo >= 0 && playerNo < game.getPlayersNumber()) {
-                game.setCurrentPlayer(game.getPlayer(playerNo));
+            if (playerNum >= 0 && playerNum < boadGame.getPlayersNumber()) {
+                boadGame.setCurrentPlayer(boadGame.getPlayer(playerNum));
             } else {
                 return null;
             }
-            getCardFields(game);
+            getCardFields(boadGame);
 
-            return game;
+            return boadGame;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Some DB error");
+            System.err.println("Error occured.");
         }
         return null;
     }
     /**
-     * > This function returns the latest gameID from the game table
+     * Returning the one that is latest saved from the table.
      *
-     * @return The latest gameID from the game table.
-     *
-     * @author Berfin
+     * @return
      */
-    public int getLatestSavedGameid() {
+    public int getLatestSavedGameId() {
         try {
-            int gameId;
-            PreparedStatement stmt = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM game ORDER BY gameID DESC LIMIT 1");
-            ResultSet sqlReturnValues = stmt.executeQuery();
-            if (!sqlReturnValues.next()) {
+            int boardGameID;
+            PreparedStatement statement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM game ORDER BY gameID DESC LIMIT 1");
+            ResultSet valuesOfReturns = statement.executeQuery();
+            if (!valuesOfReturns.next()) {
                 return 0;
             }
-            gameId = sqlReturnValues.getInt(1);
-            return gameId;
+            boardGameID = valuesOfReturns.getInt(1);
+            return boardGameID;
         } catch (SQLException ex) {
             ex.printStackTrace();
             return 0;
@@ -290,69 +251,44 @@ public class Repo{
     }
 
     /**
-     * Method for getting all the games from the database.
+     * Getting all the saved games from the database.
      *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
-     * */
+     * @return
+     */
     public List<GameIndatabase> getGames() {
-        List<GameIndatabase> result = new ArrayList<>();
+        List<GameIndatabase> gameDB = new ArrayList<>();
         try {
-            PreparedStatement ps = getSelectGameIdsStatement();
-            ResultSet rs = ps.executeQuery();
+            PreparedStatement statement = getSelectGameIdsStatement();
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt("GameID");
                 String name = rs.getString("BoardName");
                 String gameName = rs.getString(3);
-                result.add(new GameIndatabase(id, name, gameName));
+                gameDB.add(new GameIndatabase(id, name, gameName));
             }
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return result;
+        return gameDB;
     }
-/*
-    public List<GameIndatabase> getGames(){
-        List<Board> results = new ArrayList<>();
-        try {
-            Connection connection = databaseConnector.getDatabaseConnection();
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM game;");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                int id = rs.getInt("GameID");
-                String name = rs.getString("BoardName");
-                String gameName = rs.getString("gameName");
-                results.add(new GameIndatabase(id, name, gameName));
-            }
-            rs.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
-        return null;
-    }
-*/
+
     /**
-     * It creates a new row in the database for each player in the game
+     * Creating the game board in the database.
      *
-     * @param game The game to be saved
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
+     * @param game
+     * @return
      */
     private void insertPlayers(Board game) throws SQLException {
-        PreparedStatement ps;
-        Connection connection = databaseConnector.getDatabaseConnection();
+        PreparedStatement statement;
+        Connection connDB = databaseConnector.getDatabaseConnection();
         try {
-            ps = connection.prepareStatement(
+            statement = connDB.prepareStatement(
                     "SELECT * FROM Player WHERE gameID = ?",
                     ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_UPDATABLE);
-
-            ps.setInt(1, game.getGameId());
-
-            ResultSet rs = ps.executeQuery();
+            statement.setInt(1, game.getGameId());
+            ResultSet rs = statement.executeQuery();
             for (int i = 0; i < game.getPlayersNumber(); i++) {
                 Player player = game.getPlayer(i);
                 rs.moveToInsertRow();
@@ -365,87 +301,78 @@ public class Repo{
                 rs.updateInt("heading", player.getHeading().ordinal());
                 rs.insertRow();
             }
-
             rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
+
     /**
-     * It creates the card fields in the database
+     * Method will create the cardfields into the database.
      *
-     * @param game the game object
-     * @return A boolean value.
-     *
-     * @author Berfin
+     * @param game
+     * @return
+     * @throws SQLException
      */
     private boolean createCardFields(Board game) throws SQLException {
         try {
-            PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
-            ps.setInt(1, game.getGameId());
-            ps = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO CardFieldCommands (GameID, PlayerNo, isProgram, Active, Visible, Command, Position) VALUES (?,?,?,?,?,?,?)");
-
+            PreparedStatement statement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
+            statement.setInt(1, game.getGameId());
+            statement = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO CardFieldCommands (GameID, PlayerNo, isProgram, Active, Visible, Command, Position) VALUES (?,?,?,?,?,?,?)");
             for (int i = 0; i < game.getPlayersNumber(); i++) {
                 Player player = game.getPlayer(i);
                 for (int j = 0; j < Player.NO_REGISTERS; j++) {
-                    ps.setInt(1, game.getGameId());
-                    ps.setInt(2, i);
-                    ps.setInt(3, 1);
-                    ps.setInt(4, player.getProgramField(j).isActive()? 1 : 0);
-                    ps.setBoolean(5, player.getProgramField(j).isVisible());
+                    statement.setInt(1, game.getGameId());
+                    statement.setInt(2, i);
+                    statement.setInt(3, 1);
+                    statement.setInt(4, player.getProgramField(j).isActive()? 1 : 0);
+                    statement.setBoolean(5, player.getProgramField(j).isVisible());
                     if (player.getProgramField(j).getCard() != null) {
-                        ps.setInt(6, player.getProgramField(j).getCard().command.ordinal());
+                        statement.setInt(6, player.getProgramField(j).getCard().command.ordinal());
                     } else {
-                        ps.setNull(6,Types.INTEGER);
+                        statement.setNull(6,Types.INTEGER);
                     }
-                    ps.setInt(7, j);
-                    ps.execute();
+                    statement.setInt(7, j);
+                    statement.execute();
                 }
                 for (int j = 0; j < Player.NO_CARDS; j++) {
-
-                    ps.setInt(1, game.getGameId());
-                    ps.setInt(2, i);
-                    ps.setInt(3, 0);
-                    ps.setInt(4, player.getCardField(j).isActive()? 1 : 0);
-                    ps.setBoolean(5, player.getCardField(j).isVisible());
+                    statement.setInt(1, game.getGameId());
+                    statement.setInt(2, i);
+                    statement.setInt(3, 0);
+                    statement.setInt(4, player.getCardField(j).isActive()? 1 : 0);
+                    statement.setBoolean(5, player.getCardField(j).isVisible());
                     if (player.getCardField(j).getCard() != null) {
-                        ps.setInt(6, player.getCardField(j).getCard().command.ordinal());
+                        statement.setInt(6, player.getCardField(j).getCard().command.ordinal());
                     } else {
-                        ps.setNull(6,Types.INTEGER);
+                        statement.setNull(6,Types.INTEGER);
                     }
-                    ps.setInt(7, j);
-                    ps.execute();
+                    statement.setInt(7, j);
+                    statement.execute();
                 }
             }return true;
-        } catch(
-                SQLException ex)
-
-        {
+        } catch(SQLException ex)
+            {
             ex.printStackTrace();
             return false;
         }
     }
 
     /**
-     * It loads the players from the database and adds them to the game
+     * Loading player through the database and sets them into the board.
      *
-     * @param game The game object that we're loading the players into.
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
+     * @param game
+     * @throws SQLException
      */
     private void getPlayers(Board game) throws SQLException {
-        PreparedStatement ps;
+        PreparedStatement statement;
 
-        Connection connection = databaseConnector.getDatabaseConnection();
+        Connection connDB = databaseConnector.getDatabaseConnection();
         try {
             // This statement does not need to be updatable
-            ps = connection.prepareStatement(
-                    "SELECT * FROM Player WHERE GameID = ? ORDER BY PlayerNo ASC");
-            ps.setInt(1, game.getGameId());
+            statement = connDB.prepareStatement("SELECT * FROM Player WHERE GameID = ? ORDER BY PlayerNo ASC");
+            statement.setInt(1, game.getGameId());
 
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = statement.executeQuery();
             int i = 0;
             while (rs.next()) {
                 int playerId = rs.getInt("PlayerNo");
@@ -460,7 +387,6 @@ public class Repo{
                     player.setSpace(game.getSpace(x, y));
                     int heading = rs.getInt("Heading");
                     player.setHeading(Heading.values()[heading]);
-
                 } else {
                     System.err.println("Game in DB does not have a player with id " + i + "!");
                 }
@@ -471,17 +397,17 @@ public class Repo{
         }
     }
 
+
     /**
-     * It loads the command cards from the database and puts them into the card fields of the players
+     * Loading the command programming card through the database and sets them to the fields of card for the player.
      *
-     * @param game the game object
-     *
-     * @author Berfin
+     * @param game
+     * @throws SQLException
      */
     private void getCardFields(Board game) throws SQLException {
-        PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
-        ps.setInt(1, game.getGameId());
-        ResultSet rs = ps.executeQuery();
+        PreparedStatement statement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
+        statement.setInt(1, game.getGameId());
+        ResultSet rs = statement.executeQuery();
         int playerID;
         int isProgram;
         int active;
@@ -520,35 +446,28 @@ public class Repo{
                         commandCardField.setCard(commandCard);
                     }
                 }
-
                 commandCardField.setVisible(visible != 0);
                 commandCardField.setActive(active != 0);
-
             }
         }rs.close();
     }
 
     /**
-     * "Update the database with the current state of the players in the game."
+     * Will be updating the current state of players who are playing in the game, and that happens in the database.
      *
-     * The first thing we do is get a prepared statement for updating the players.  We then set the first parameter of the
-     * prepared statement to the game id.  This will be used to select the players for the game
-     *
-     * @param game the game to save
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
+     * @param game
+     * @throws SQLException
      */
     private void updatePlayersInDB(Board game) throws SQLException {
-        PreparedStatement ps;
-        Connection connection = databaseConnector.getDatabaseConnection();
+        PreparedStatement statement;
+        Connection connDB = databaseConnector.getDatabaseConnection();
         try {
             // This statement does not need to be updatable
-            ps = connection.prepareStatement(
+            statement = connDB.prepareStatement(
                     "SELECT * FROM Player WHERE GameID = ? ORDER BY PlayerNo ASC");
-            ps.setInt(1, game.getGameId());
+            statement.setInt(1, game.getGameId());
 
-            ResultSet rs = ps.executeQuery();
+            ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 int playerId = rs.getInt("PlayerNo");
                 Player player = game.getPlayer(playerId);
@@ -579,20 +498,18 @@ public class Repo{
     private static final String SQL_SELECT_GAME =
             "SELECT * FROM Game WHERE gameID = ?";
 
-    private PreparedStatement select_game_stmt = null;
+    private PreparedStatement selectBoardStatement = null;
 
     /**
-     * > This function returns a prepared statement that can be used to select a game from the database
+     * Returning a preparedStatement which can be used to select a board game through the database.
      *
-     * @return A PreparedStatement object.
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
+     * @return
      */
     private PreparedStatement getSelectGameStatementU() {
-        if (select_game_stmt == null) {
-            Connection connection = databaseConnector.getDatabaseConnection();
+        if (selectBoardStatement == null) {
+            Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                select_game_stmt = connection.prepareStatement(
+                selectBoardStatement = connDB.prepareStatement(
                         SQL_SELECT_GAME,
                         ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_UPDATABLE);
@@ -600,66 +517,29 @@ public class Repo{
                 e.printStackTrace();
             }
         }
-        return select_game_stmt;
+        return selectBoardStatement;
     }
-
-
-    private PreparedStatement select_players_stmt = null;
-
-    /**
-     * > This function returns a PreparedStatement that can be used to select all the cards in the database
-     *
-     * @return A PreparedStatement object.
-     *
-     * @author Berfin
-     */
-    private PreparedStatement getSelectCardsStatementU() {
-        if (select_cards_stmt == null) {
-            Connection connection = databaseConnector.getDatabaseConnection();
-            try {
-                select_cards_stmt = connection.prepareStatement(
-                        SQL_SELECT_CARDS,
-                        ResultSet.TYPE_FORWARD_ONLY,
-                        ResultSet.CONCUR_UPDATABLE);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return select_cards_stmt;
-    }
-
-    private PreparedStatement select_cards_stmt = null;
-
-    private static final String SQL_SELECT_CARDS =
-            "SELECT * FROM cardfield WHERE gameID = ?";
-
-
-    private PreparedStatement select_players_asc_stmt = null;
-
 
     private static final String SQL_SELECT_GAMES =
             "SELECT gameID, boardName, gameName FROM game ORDER BY gameID DESC LIMIT 10";
 
-    private PreparedStatement select_games_stmt = null;
+    private PreparedStatement selectBoardsStatement = null;
+
 
     /**
-     * If the statement is null, get a connection, create the statement, and return it
+     * Is the statement null? If so, getting a connection, creating the statement, and returning it.
      *
-     * @return A PreparedStatement object.
-     *
-     * @author Ekkart Kindler, ekki@dtu.dk
-     * @author Berfin
+     * @return
      */
     private PreparedStatement getSelectGameIdsStatement() {
-        if (select_games_stmt == null) {
-            Connection connection = databaseConnector.getDatabaseConnection();
+        if (selectBoardsStatement == null) {
+            Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                select_games_stmt = connection.prepareStatement(
-                        SQL_SELECT_GAMES);
+                selectBoardsStatement = connDB.prepareStatement(SQL_SELECT_GAMES);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return select_games_stmt;
+        return selectBoardsStatement;
     }
 }

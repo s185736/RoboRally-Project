@@ -44,8 +44,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.*;
 import java.util.*;
 
-import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.loadBoard;
-import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.saveBoard;
 import static java.lang.Integer.parseInt;
 
 /**
@@ -300,7 +298,7 @@ public class AppController implements Observer {
             Optional<String> result = textSave.showAndWait();
             gameController.board.setGameName(result.get());
             if(result.isPresent()) {
-                RepoAccesser.getRepository().insertGame(gameController.board);
+                RepoAccesser.getRepository().insertCreationGame(gameController.board);
                 System.out.println("The Game Board is now saved in DB.");
             }
         } else {
@@ -314,7 +312,7 @@ public class AppController implements Observer {
         List<GameIndatabase> games = repo.getGames();
         if (!games.isEmpty()) {
             for (GameIndatabase game: games) {
-                gameElements.put(game.gameName, game.id);
+                gameElements.put(game.boardName, game.id);
             }
         }
         return gameElements;

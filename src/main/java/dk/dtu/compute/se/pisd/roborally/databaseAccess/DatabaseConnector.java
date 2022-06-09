@@ -8,10 +8,17 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ *
+ * @author Ekkart Kindler, ekki@dtu.dk
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
+ */
+
 public class DatabaseConnector {
 
 
-    // Tilpas variable til jeres database.
+    // Configurations
     // -----------------------------------
     String host = "localhost"; //host is "localhost" or "127.0.0.1"
     String port = "3306"; //port is where to communicate with the RDBM system
@@ -20,7 +27,7 @@ public class DatabaseConnector {
     // Set username og password.
     // -------------------------
     String username = "root";		// Username for connection
-    String password = "Sammy123";	// Password for username
+    String password = "";	// Password for username
     String delimiter = ";;";
 
     Connection connection = null;
@@ -29,20 +36,19 @@ public class DatabaseConnector {
     DatabaseConnector(){
         try{
             String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC&useSSL=false";
-
             // Get connection to database.
             connection = DriverManager.getConnection(url, username, password);
-
             // database schema metode skal kaldes her
-            createSchemaForDatabase();
+            createDBschema();
             System.out.println("Connected to database");
 
         } catch (Exception e){
             e.printStackTrace();
         }
     }
-    // der laves en metode der opretter en database schema
-    private void createSchemaForDatabase(){
+
+    // Method for connecting to a database schema.
+    private void createDBschema(){
         String createStatementTables = IOUtil.readResource("schemas/databaseSchema.sql");
 
         try {
