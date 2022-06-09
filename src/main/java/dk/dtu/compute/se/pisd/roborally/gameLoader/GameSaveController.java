@@ -3,7 +3,6 @@ package dk.dtu.compute.se.pisd.roborally.gameLoader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonWriter;
-import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.view.board.BoardLayout;

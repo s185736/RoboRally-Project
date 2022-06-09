@@ -28,7 +28,7 @@ import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
 import dk.dtu.compute.se.pisd.roborally.gameLoader.GameLoader;
-import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
+import dk.dtu.compute.se.pisd.roborally.gameLoader.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
