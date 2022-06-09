@@ -33,7 +33,9 @@ import java.util.*;
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
+ * @author Malaz Alzarrad, s180424@dtu.dk
  */
 public class GameController {
 

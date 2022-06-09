@@ -20,9 +20,5 @@ public class PlayerTemplate {
 
     public SpaceTemplate space;
 
-    public List<CommandCardFieldTemplate> cards = new ArrayList<>();
-
-    public List<CommandCardFieldTemplate> program = new ArrayList<>();
-
 
 }

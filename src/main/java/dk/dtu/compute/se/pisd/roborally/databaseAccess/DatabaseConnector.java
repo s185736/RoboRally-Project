@@ -8,47 +8,50 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * ...
+ *
+ * @author Ekkart Kindler, ekki@dtu.dk
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
+ */
+
 public class DatabaseConnector {
 
 
-    // Tilpas variable til jeres database.
+    // Configurations / connections to DB.
     // -----------------------------------
     String host = "localhost"; //host is "localhost" or "127.0.0.1"
     String port = "3306"; //port is where to communicate with the RDBM system
     String database = "roborally"; //database containing tables to be queried
 
-    // Set username og password.
+    // Set username and password.
     // -------------------------
     String username = "root";		// Username for connection
-    String password = "Sammy123";	// Password for username
+    String password = "123skole";	// Password for username
     String delimiter = ";;";
 
     Connection connection = null;
 
-
     DatabaseConnector(){
         try{
             String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC&useSSL=false";
-
             // Get connection to database.
             connection = DriverManager.getConnection(url, username, password);
-
-            // database schema metode skal kaldes her
-            createSchemaForDatabase();
-            System.out.println("Connected to database");
-
+            createSchemaDB(); //calling..
+            System.out.println("Connected to the Database..");
         } catch (Exception e){
             e.printStackTrace();
         }
     }
-    // der laves en metode der opretter en database schema
-    private void createSchemaForDatabase(){
-        String createStatementTables = IOUtil.readResource("schemas/databaseSchema.sql");
 
+    // The schema is being connected to the Database.
+    private void createSchemaDB(){
+        String schema = IOUtil.readResource("schemas/databaseSchema.sql");
         try {
             connection.setAutoCommit(false);
             Statement statement = connection.createStatement();
-            for (String SQL : createStatementTables.split(delimiter)){
+            for (String SQL : schema.split(delimiter)){
                 if (!StringUtils.isEmptyOrWhitespaceOnly(SQL)){
                     statement.executeUpdate(SQL);
                 }

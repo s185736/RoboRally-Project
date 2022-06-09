@@ -21,8 +21,6 @@
  */
 package dk.dtu.compute.se.pisd.roborally.controller;
 
-import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
@@ -30,29 +28,24 @@ import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameIndatabase;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
-import dk.dtu.compute.se.pisd.roborally.gameLoader.GameLoader;
-import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
-import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
-import dk.dtu.compute.se.pisd.roborally.view.board.BoardLayout;
 import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.*;
 import java.util.*;
 
-import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.loadBoard;
-import static dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard.saveBoard;
 import static java.lang.Integer.parseInt;
 
 /**
  * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
- *
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
+ * @author Malaz Alzarrad, s180424@dtu.dk
  */
 public class AppController implements Observer {
 
@@ -202,13 +195,13 @@ public class AppController implements Observer {
 
             /*Can be reduced, but doing the below for testing.*/
             if (result.isPresent()) {
-                RepoAccesser.getRepository().insertGame(gameController.board);
+                RepoAccesser.getRepository().insertCreatedGame(gameController.board);
                 System.out.println("Game is added and saved in DB");
             } else {
                 System.out.println("Alert: Game has been updated.");
             }
             if (!result.isPresent()) {
-                RepoAccesser.getRepository().updateGame(gameController.board);
+                RepoAccesser.getRepository().updateCreatedGame(gameController.board);
                 System.out.println("Game updated in DB");
             } else {
                 System.out.println("Alert: Game has been saved and added.");
@@ -236,7 +229,7 @@ public class AppController implements Observer {
     public BoardView loadGame(Integer id) {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
-        Board board = RepoAccesser.getRepository().loadGame(id);
+        Board board = RepoAccesser.getRepository().loadCreatedGame(id);
         gameController = new GameController(board);
         System.out.println("Game loaded");
 

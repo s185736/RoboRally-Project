@@ -28,13 +28,9 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
-import dk.dtu.compute.se.pisd.roborally.fileaccess.model.CommandCardFieldTemplate;
-import dk.dtu.compute.se.pisd.roborally.fileaccess.model.PlayerTemplate;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.SpaceTemplate;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
-import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCardField;
-import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 
 import java.io.*;
@@ -52,7 +48,6 @@ public class LoadBoard {
     private static final String BOARDSFOLDER = "boards";
     private static final String DEFAULTBOARD = "defaultboard";
     private static final String JSON_EXT = "json";
-    private Repo repo;
 
     public static ArrayList<String> ShowTheListOfTheGameBoards() {
         ArrayList<String> boardNames = new ArrayList<>();

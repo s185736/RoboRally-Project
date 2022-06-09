@@ -28,10 +28,12 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A utility class reading strings from resources and arbitrary input streams.
+ * ...
  *
  * @author Ekkart Kindler, ekki@dtu.dk
+ *
  */
+
 public class IOUtil {
 
     /**
