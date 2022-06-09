@@ -33,7 +33,7 @@ public class Repo{
                 connection.setAutoCommit(false);
 
                 PreparedStatement ps = connection.prepareStatement(
-                        "INSERT INTO Game(name, currentPlayer, phase, step, gameName) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO Game(boardName, currentPlayer, phase, step, gameName) VALUES (?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);
                 ps.setString(1, game.boardName);
                 ps.setNull(2, game.getCurrentPlayer().no); // game.getPlayerNumber(game.getCurrentPlayer())); is inserted after players!
@@ -58,7 +58,7 @@ public class Repo{
 
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
-                    rs.updateInt(GAME_CURRENTPLAYER, game. getPlayerNo(game.getCurrentPlayer()));
+                    rs.updateInt("CurrentPlayer", game. getPlayerNo(game.getCurrentPlayer()));
                     rs.updateRow();
                 }
                 rs.close();
@@ -78,15 +78,7 @@ public class Repo{
                 }
             }
             LoadBoard.saveBoard(game, game.boardName);
-        } else {
-            System.err.println("Game cannot be created in DB, since it has a game id already!");
-            updateGame(game);
-            try {
-                updatePlayersInDB(game);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        }
+
         return false;
     }
 
@@ -108,9 +100,9 @@ public class Repo{
 
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                rs.updateInt(GAME_CURRENTPLAYER, game.getPlayerNo(game.getCurrentPlayer()));
-                rs.updateInt(GAME_PHASE, game.getPhase().ordinal());
-                rs.updateInt(GAME_STEP, game.getStep());
+                rs.updateInt("CurrentPlayer", game.getPlayerNo(game.getCurrentPlayer()));
+                rs.updateInt("Phase", game.getPhase().ordinal());
+                rs.updateInt("Step", game.getStep());
                 rs.updateRow();
             } else {
             }
@@ -178,7 +170,7 @@ public class Repo{
         Connection connection = databaseConnector.getDatabaseConnection();
         try {
             ps = connection.prepareStatement(
-                    "Select all from CommandCardField where GameID = ?",
+                    "Select * from CardFieldCommands where GameID = ?",
                     ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_UPDATABLE);
             ps.setInt(1, game.getGameId());
@@ -251,6 +243,7 @@ public class Repo{
                 playerNo = rs.getInt("CurrentPlayer");
                 game.setPhase(Phase.values()[rs.getInt("Phase")]);
                 game.setStep(rs.getInt("Step"));
+
             } else {
                 return null;
             }
@@ -308,8 +301,8 @@ public class Repo{
             PreparedStatement ps = getSelectGameIdsStatement();
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                int id = rs.getInt(GAME_GAMEID);
-                String name = rs.getString(GAME_NAME);
+                int id = rs.getInt("GameID");
+                String name = rs.getString("BoardName");
                 String gameName = rs.getString(3);
                 result.add(new GameIndatabase(id, name, gameName));
             }
@@ -319,7 +312,27 @@ public class Repo{
         }
         return result;
     }
-
+/*
+    public List<GameIndatabase> getGames(){
+        List<Board> results = new ArrayList<>();
+        try {
+            Connection connection = databaseConnector.getDatabaseConnection();
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM game;");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("GameID");
+                String name = rs.getString("BoardName");
+                String gameName = rs.getString("gameName");
+                results.add(new GameIndatabase(id, name, gameName));
+            }
+            rs.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+        return null;
+    }
+*/
     /**
      * It creates a new row in the database for each player in the game
      *
@@ -369,9 +382,9 @@ public class Repo{
      */
     private boolean createCardFields(Board game) throws SQLException {
         try {
-            PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM cardfield WHERE gameID = ?");
+            PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
             ps.setInt(1, game.getGameId());
-            ps = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO cardfield (GameID, PlayerNo, isProgram, Active, Visible, Command) VALUES (?,?,?,?,?,?)");
+            ps = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO CardFieldCommands (GameID, PlayerNo, isProgram, Active, Visible, Command, Position) VALUES (?,?,?,?,?,?,?)");
 
             for (int i = 0; i < game.getPlayersNumber(); i++) {
                 Player player = game.getPlayer(i);
@@ -386,6 +399,7 @@ public class Repo{
                     } else {
                         ps.setNull(6,Types.INTEGER);
                     }
+                    ps.setInt(7, j);
                     ps.execute();
                 }
                 for (int j = 0; j < Player.NO_CARDS; j++) {
@@ -393,13 +407,14 @@ public class Repo{
                     ps.setInt(1, game.getGameId());
                     ps.setInt(2, i);
                     ps.setInt(3, 0);
-                    ps.setInt(4, player.getProgramField(j).isActive()? 1 : 0);
+                    ps.setInt(4, player.getCardField(j).isActive()? 1 : 0);
                     ps.setBoolean(5, player.getCardField(j).isVisible());
                     if (player.getCardField(j).getCard() != null) {
                         ps.setInt(6, player.getCardField(j).getCard().command.ordinal());
                     } else {
                         ps.setNull(6,Types.INTEGER);
                     }
+                    ps.setInt(7, j);
                     ps.execute();
                 }
             }return true;
@@ -464,7 +479,7 @@ public class Repo{
      * @author Berfin
      */
     private void getCardFields(Board game) throws SQLException {
-        PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM cardfield WHERE gameID = ?");
+        PreparedStatement ps = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
         ps.setInt(1, game.getGameId());
         ResultSet rs = ps.executeQuery();
         int playerID;
@@ -488,25 +503,27 @@ public class Repo{
                 if (rs.getInt("Command") == -1){
                     command = null;
                 }
+                CommandCardField commandCardField;
+                if(isProgram == 0) {
+                    commandCardField = player.getCardField(position);
+                } else commandCardField = player.getProgramField(position);
+
 
                 if (command != null) {
-                    if (isProgram == 1) {
-                        CommandCardField commandCardField;
-                        Command c = Command.values()[(int) command];
+                    if (isProgram == 0) {
+                        Command c = Command.values()[Integer.parseInt((String) command)];
                         CommandCard commandCard = new CommandCard(c);
-                        commandCardField = player.getCardField(position);
                         commandCardField.setCard(commandCard);
-                        commandCardField.setVisible(visible != 0);
-                        commandCardField.setActive(active != 0);
-                    } else if (isProgram == 0) {
-                        CommandCardField commandCardField;
-                        Command c = Command.values()[(int) command];
+                    } else if (isProgram == 1) {
+                        Command c = Command.values()[Integer.parseInt((String) command)];
                         CommandCard commandCard = new CommandCard(c);
-                        commandCardField = player.getProgramField(position);
                         commandCardField.setCard(commandCard);
-                        commandCardField.setVisible(visible != 1);
                     }
                 }
+
+                commandCardField.setVisible(visible != 0);
+                commandCardField.setActive(active != 0);
+
             }
         }rs.close();
     }
@@ -621,7 +638,7 @@ public class Repo{
 
 
     private static final String SQL_SELECT_GAMES =
-            "SELECT gameID, name, gameName FROM game ORDER BY gameID DESC LIMIT 10";
+            "SELECT gameID, boardName, gameName FROM game ORDER BY gameID DESC LIMIT 10";
 
     private PreparedStatement select_games_stmt = null;
 

@@ -35,6 +35,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Map;
+
 /**
  * ...
  *
@@ -43,7 +45,7 @@ import javafx.stage.Stage;
  */
 public class RoboRally extends Application {
 
-    private AppController appController;
+    private AppController appController = new AppController(this) ;
 
     private RoboRallyMenuBar menubar;
 
@@ -130,21 +132,25 @@ public class RoboRally extends Application {
             appController.saveGame();
         });
 
-        MenuItem item4 = new MenuItem("Load Game");
-        item4.setOnAction(e -> {
+        Menu item4 = new Menu("Load Game");
+        Map<String, Integer> games = appController.getGamesAsMenuItems();
+        for (Map.Entry<String, Integer> game: games.entrySet()) {
+            MenuItem loadItem = new MenuItem(game.getKey());
+            loadItem.setId(game.getValue().toString());
+            loadItem.setOnAction(e -> {
+                this.boardView = this.appController.loadGame(Integer.parseInt(loadItem.getId()));
+                Scene scene = this.stage.getScene();
+                Parent root = scene.getRoot();
+                ((BorderPane) root).setCenter(this.boardView);
 
-            appController.loadGame(null);
-
-            Scene scene = this.stage.getScene();
-            Parent root = scene.getRoot();
-            ((BorderPane) root).setCenter(this.boardView);
-
-            stage.sizeToScene();
-            stage.centerOnScreen();
+                stage.sizeToScene();
+                stage.centerOnScreen();
 
 
-            appController.startGame();
-        });
+            });
+            item4.getItems().add(loadItem);
+        }
+
 
 
         MenuItem item5 = new MenuItem("Exit");
@@ -153,8 +159,8 @@ public class RoboRally extends Application {
 
         });
 
-        menu.getItems().addAll(item1, item2, item3, item4, item5);
-        menuBar.getMenus().add(menu);
+        menu.getItems().addAll(item1, item2, item3, item5);
+        menuBar.getMenus().addAll(menu, item4);
 
         return menuBar;
     }

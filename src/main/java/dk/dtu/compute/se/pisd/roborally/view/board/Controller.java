@@ -22,7 +22,7 @@ public class Controller {
     }
 
     public void newCretBoard() {
-        this.board = new Board(this.x, this.y);
+        //this.board = new Board(this.x, this.y);
         this.board.setAntenna(null);
     }
 

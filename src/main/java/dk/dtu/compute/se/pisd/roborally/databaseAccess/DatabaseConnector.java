@@ -15,13 +15,12 @@ public class DatabaseConnector {
     // -----------------------------------
     String host = "localhost"; //host is "localhost" or "127.0.0.1"
     String port = "3306"; //port is where to communicate with the RDBM system
-    String database = "roboRally"; //database containing tables to be queried
-    String cp = "utf8"; //Database codepage supporting danish (i.e. æøåÆØÅ)
+    String database = "roborally"; //database containing tables to be queried
 
     // Set username og password.
     // -------------------------
     String username = "root";		// Username for connection
-    String password = "02327";	// Password for username
+    String password = "Sammy123";	// Password for username
     String delimiter = ";;";
 
     Connection connection = null;
@@ -29,7 +28,7 @@ public class DatabaseConnector {
 
     DatabaseConnector(){
         try{
-            String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?characterEncoding=" + cp;
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?serverTimezone=UTC&useSSL=false";
 
             // Get connection to database.
             connection = DriverManager.getConnection(url, username, password);
@@ -39,7 +38,7 @@ public class DatabaseConnector {
             System.out.println("Connected to database");
 
         } catch (Exception e){
-            e.getMessage();
+            e.printStackTrace();
         }
     }
     // der laves en metode der opretter en database schema

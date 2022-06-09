@@ -67,6 +67,7 @@ public class Player extends Subject {
      * @param name
      */
     public Player(@NotNull Board board, String color, @NotNull String name) {
+        this.no = playerCount;
         playerCount++;
 
         this.board = board;
@@ -86,6 +87,7 @@ public class Player extends Subject {
         }
     }
     public Player(@NotNull Board board, String color, @NotNull String name, @NotNull Space space) {
+        this.no = playerCount;
         playerCount++;
 
         this.board = board;
@@ -187,6 +189,7 @@ public class Player extends Subject {
      */
     public void setDatabaseNo(int databaseNo) {
         this.dbNo = databaseNo;
+        this.no = databaseNo;
     }
 
     /**

@@ -47,7 +47,7 @@ public class BoardLayout {
     public Board getInfoToGameBoard() {
         Board board;
         Antenna antenna;
-        board = new Board(this.x, this.y);
+        board = new Board(this.x, this.y,"cæemw");
         antenna = new Antenna(board, this.ant_X, this.ant_y);
         board.setAntenna(antenna);
         splay.stream().map(spaceLayout -> spaceLayout.getInfoToGameSpace(board)).forEach(space -> board.getSpaces()[space.x][space.y] = space);

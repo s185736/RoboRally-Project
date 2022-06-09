@@ -26,7 +26,9 @@ import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
+import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameIndatabase;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
+import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
 import dk.dtu.compute.se.pisd.roborally.gameLoader.GameLoader;
 import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
@@ -65,7 +67,8 @@ public class AppController implements Observer {
     private Board board = null;
     private BoardView boardView;
     private int chosenNumberOfPlayers = 0;
-    private Repo repo;
+    private Repo repo = RepoAccesser.getRepository();
+    private AppController appController;
 
     /**
      * @param roboRally
@@ -172,7 +175,8 @@ public class AppController implements Observer {
             // here we save the game (without asking the user).
             saveGame();
             gameController = null;
-            //roboRally.createBoardView(null);
+            // nedenunder skal måske udkommenteres
+            roboRally.createBoardView(null);
             return true;
         }
         return false;
@@ -208,7 +212,7 @@ public class AppController implements Observer {
         InputStream inputS = null;
 
         if (layout == null) {
-            return new Board(8,8);
+            return new Board(8,8,"default");
         }
 
         /*Will read info through the json file...*/
@@ -257,9 +261,9 @@ public class AppController implements Observer {
 
 
         // https://attacomsian.com/blog/gson-write-json-file
-        //LoadBoard gameSaver = new LoadBoard();
+        LoadBoard gameSaver = new LoadBoard();
 
-        saveBoard(this.board, "defaultboard");
+        //saveBoard(this.board, "defaultboard");
 
 
         if (gameController.board.getGameId() == null){
@@ -275,7 +279,7 @@ public class AppController implements Observer {
 
         }
 
-        if (gameController.board.getGameId() == null) {
+        if (gameController.board.getGameId() == 0) {
             TextInputDialog dialog = new TextInputDialog("Game name");
             dialog.setTitle("Chose name for save");
             dialog.setHeaderText("Name your saved game");
@@ -283,21 +287,32 @@ public class AppController implements Observer {
             Optional<String> result = dialog.showAndWait();
             gameController.board.setGameName(result.get());
             if(result.isPresent()) {
-                RepositoryAccess.getRepository().createGameInDB(gameController.board);
+                repo.insertGame(gameController.board);
                 System.out.println("Game saved in DB");
             }
         } else {
-            RepositoryAccess.getRepository().updateGameInDB(gameController.board);
+            repo.updateGame(gameController.board);
             System.out.println("Game updated in DB");
         }
 
+    }
+
+    public Map<String, Integer> getGamesAsMenuItems(){
+        Map<String, Integer> gameElements = new HashMap<>();
+        List<GameIndatabase> games = repo.getGames();
+        if (!games.isEmpty()) {
+            for (GameIndatabase game: games) {
+                gameElements.put(game.gameName, game.id);
+            }
+        }
+        return gameElements;
     }
 
     public void startGame() {
         this.gameController.startProgrammingPhase();
     }
 
-    public void loadGame(Integer id) {
+    public BoardView loadGame(Integer id) {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
 
@@ -316,9 +331,12 @@ public class AppController implements Observer {
         }
 
         if (gameController == null) {
-            newGame();
-        }
-        else roboRally.createBoardView(gameController);
+            return newGame();
+
+        } else return boardView = new BoardView(gameController);
+        //else roboRally.createBoardView(gameController);
+
+
     }
 
     public boolean isGameRunning() {
