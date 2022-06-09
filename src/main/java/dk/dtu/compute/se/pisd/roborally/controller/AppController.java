@@ -38,7 +38,10 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
 import dk.dtu.compute.se.pisd.roborally.view.board.BoardLayout;
 import javafx.application.Platform;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.TextInputDialog;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -58,7 +61,6 @@ public class AppController implements Observer {
 
     final private List<Integer> PLAYER_NUMBER_OPTIONS = Arrays.asList(2, 3, 4, 5, 6);
     final private List<String> PLAYER_COLORS = Arrays.asList("red", "green", "blue", "orange", "grey", "magenta");
-    final private ArrayList<String> BOARD_NAMES = LoadBoard.ShowTheListOfTheGameBoards();
 
     private GameController gameController;
     private RoboRally roboRally;
@@ -79,43 +81,17 @@ public class AppController implements Observer {
      * @return
      */
     public BoardView newGameMain() {
-        newGameSetup(); //temp solution..
-        return null;
-    }
-
-    public void newGameSetup() {
-        ChoiceDialog<String> boardSelection = new ChoiceDialog<>("defaultboard", BOARD_NAMES);
-        boardSelection.setTitle("Board choice");
-        boardSelection.setHeaderText("Select a board");
-        Optional<String> choice = boardSelection.showAndWait();
-
-        ChoiceDialog<Integer> playerAmountSelection = new ChoiceDialog<>(PLAYER_NUMBER_OPTIONS.get(0), PLAYER_NUMBER_OPTIONS);
-        playerAmountSelection.setTitle("Player number");
-        playerAmountSelection.setHeaderText("Select number of players");
-        Optional<Integer> result = playerAmountSelection.showAndWait();
-
-        if (result.isPresent() && choice.isPresent()) {
-            if (gameController != null) {
-                if (!stopGame()) {
-                    return;
-                }
-            }
-            Board board = LoadBoard.loadBoard(choice.get());
-            gameController = new GameController(board);
-
-            int x = result.get();
-            for (int i = 0; i < x; i++) {
-                Player player = new Player(board, PLAYER_COLORS.get(i), "Player " + (i + 1));
-                board.addPlayer(player);
-                player.setSpace(board.getSpace(i % board.width, i));
-            }
-            gameController.startProgrammingPhase();
-            if (board.getCurrentPlayer()==null) {
-                board.setCurrentPlayer(board.getPlayer(0));
-            }
-
-            roboRally.createBoardView(gameController);
+        String layout = this.selectBoardLayout();
+        if (layout.equals("")) { //invalid file...
+            layout = "default";
         }
+        this.board = createBoardFromLayout(layout);
+        this.gameController = new GameController(this.board);
+
+        int noOfPlayers = this.numberOfPlayers();
+        this.gameController.createPlayers(noOfPlayers);
+
+        return boardView = new BoardView(gameController);
     }
 
     /**
@@ -208,33 +184,19 @@ public class AppController implements Observer {
 
     public void exit() {
         if (gameController != null) {
-            Alert alertExit = new Alert(Alert.AlertType.CONFIRMATION);
-            alertExit.setTitle("Exit RoboRally?");
-            alertExit.setContentText("Are you sure you want to exit RoboRally?");
-            Optional<ButtonType> result = alertExit.showAndWait();
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Exit RoboRally?");
+            alert.setContentText("Are you sure you want to exit RoboRally?");
+            Optional<ButtonType> result = alert.showAndWait();
+
             if (!result.isPresent() || result.get() != ButtonType.OK) {
-                return;
-            }
-            ButtonType accept = new ButtonType("Yes", ButtonBar.ButtonData.YES);
-            ButtonType denied = new ButtonType("No", ButtonBar.ButtonData.NO);
-            Alert alertSave = new Alert(Alert.AlertType.CONFIRMATION, "Would you like to save the game before exitting?", accept, denied);
-
-            alertSave.setTitle("Save Board Game?");
-            Optional<ButtonType> re = alertSave.showAndWait();
-
-            if (!re.isPresent() || re.get() != accept) {
-                Platform.exit(); // return without exiting the application
-            } else if (re.get() == accept){
-                stopGame();
-                Platform.exit();
-            }
-            else {
-                re.get();
+                return; // return without exiting the application
             }
         }
+
         // If the user did not cancel, the RoboRally application will exit
         // after the option to save the game
-        if (gameController == null) {
+        if (gameController == null || stopGame()) {
             Platform.exit();
         }
     }
@@ -292,21 +254,47 @@ public class AppController implements Observer {
     }
 
     public void saveGame() {
-        if (gameController.board.getGameId() == null) {
-            TextInputDialog textSave = new TextInputDialog("Game name");
-            textSave.setTitle("Chose name for save");
-            textSave.setHeaderText("Name your saved game");
-            textSave.setContentText("Please enter game name:");
-            Optional<String> result = textSave.showAndWait();
+
+        // XXX needs to be implemented eventually
+
+        //implementering af save game
+
+
+        // https://attacomsian.com/blog/gson-write-json-file
+        LoadBoard gameSaver = new LoadBoard();
+
+        //saveBoard(this.board, "defaultboard");
+
+
+        if (gameController.board.getGameId() == null){
+            TextInputDialog text = new TextInputDialog("Name of the game");
+            /* skal omskrives
+            text.setTitle("Chose name for save");
+            text.setHeaderText("Name your saved game");
+            text.setContentText("Please enter game name:");
+            Optional<String> result = dialog.showAndWait();
+
+             */
+
+
+        }
+
+        if (gameController.board.getGameId() == 0) {
+            TextInputDialog dialog = new TextInputDialog("Game name");
+            dialog.setTitle("Chose name for save");
+            dialog.setHeaderText("Name your saved game");
+            dialog.setContentText("Please enter game name:");
+            Optional<String> result = dialog.showAndWait();
             gameController.board.setGameName(result.get());
             if(result.isPresent()) {
-                RepoAccesser.getRepository().insertGame(gameController.board);
-                System.out.println("The Game Board is now saved in DB.");
+                repo.insertGame(gameController.board);
+                System.out.println("Game saved in DB");
             }
         } else {
-            RepoAccesser.getRepository().updateGame(gameController.board);
-            System.out.println("The Game Board is now updated in DB.");
+            repo.updateGame(gameController.board);
+            System.out.println("Game updated in DB");
         }
+
     }
 
     public Map<String, Integer> getGamesAsMenuItems(){
@@ -324,27 +312,31 @@ public class AppController implements Observer {
         this.gameController.startProgrammingPhase();
     }
 
-    public void loadGameSetup(int id) {
-        // XXX needs to be implememted eventually
-        // for now, we just create a new game
-        Board board = RepoAccesser.getRepository().loadGame(id);
-        gameController = new GameController(board);
-        System.out.println("Game has been loaded.");
-
-        int x = board.getPlayersNumber();
-        for (int i = 0; i < x; i++) {
-            Player player = board.getPlayer(i);
-            board.addPlayer(player);
-            player.setSpace(board.getPlayer(i).getSpace());
-        }
-        roboRally.createBoardView(gameController);
-    }
-
     public BoardView loadGame(Integer id) {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
-        loadGameSetup(id);
-        return null;
+
+        if(id == null) {
+            this.board = loadBoard("defaultboard");
+        } else this.board = this.repo.loadGame(id);
+
+        gameController = new GameController(board);
+        System.out.println("game is loaded");
+
+        int numberOfPlayers = this.board.getNumberOfPlayers();
+        for (int i = 0; i < numberOfPlayers; i++){
+            Player p = this.board.getPlayer(i);
+            this.board.addPlayer(p);
+            p.setSpace(this.board.getPlayer(i).getSpace());
+        }
+
+        if (gameController == null) {
+            return newGame();
+
+        } else return boardView = new BoardView(gameController);
+        //else roboRally.createBoardView(gameController);
+
+
     }
 
     public boolean isGameRunning() {
