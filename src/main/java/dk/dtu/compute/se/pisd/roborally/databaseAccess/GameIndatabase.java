@@ -1,23 +1,17 @@
 package dk.dtu.compute.se.pisd.roborally.databaseAccess;
 
-/**
- *
- * @author Ekkart Kindler, ekki@dtu.dk
- */
-
 public class GameIndatabase {
-
     public final int id;
     public final String name;
-    public final String boardName;
+    public final String gameName;
 
-    public GameIndatabase(int id, String name, String boardName) {
+    public GameIndatabase(int id, String name, String gameName) {
         this.id = id;
         this.name = name;
-        this.boardName = boardName;
+        this.gameName = gameName;
 
     }
 
     @Override
-    public String toString() {return boardName;}
+    public String toString() {return gameName;}
 }

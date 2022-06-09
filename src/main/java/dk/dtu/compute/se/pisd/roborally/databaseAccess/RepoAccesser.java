@@ -1,9 +1,5 @@
 package dk.dtu.compute.se.pisd.roborally.databaseAccess;
 
-/**
- *
- * @author Ekkart Kindler, ekki@dtu.dk
- */
 
 public class RepoAccesser {
     private static Repo repo;
