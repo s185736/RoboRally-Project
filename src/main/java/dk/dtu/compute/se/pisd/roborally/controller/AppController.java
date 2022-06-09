@@ -103,7 +103,7 @@ public class AppController implements Observer {
                 player.setSpace(board.getSpace(i % board.width, i));
             }
             gameController.startProgrammingPhase();
-            if (board.getCurrentPlayer()==null) {
+            if (board.getCurrentPlayer() == null) {
                 board.setCurrentPlayer(board.getPlayer(0));
             }
 
@@ -160,11 +160,10 @@ public class AppController implements Observer {
 
             if (!buttonType2.isPresent() || buttonType2.get() != yes) {
                 Platform.exit();
-            } else if (buttonType2.get() == yes){
+            } else if (buttonType2.get() == yes) {
                 stopGame();
                 Platform.exit();
-            }
-            else {
+            } else {
                 buttonType2.get();
             }
         }
@@ -178,6 +177,22 @@ public class AppController implements Observer {
     public void saveGame() {
         // XXX needs to be implemented eventually
         //implementering af save game
+        // https://attacomsian.com/blog/gson-write-json-file
+        LoadBoard gameSaver = new LoadBoard();
+        //saveBoard(this.board, "defaultboard");
+
+        if (gameController.board.getGameId() == null) {
+            TextInputDialog text = new TextInputDialog("Name of the game");
+            /* skal omskrives
+            text.setTitle("Chose name for save");
+            text.setHeaderText("Name your saved game");
+            text.setContentText("Please enter game name:");
+            Optional<String> result = dialog.showAndWait();
+
+             */
+        }
+
+        if (gameController.board.getGameId() == 0) {
             TextInputDialog dialog = new TextInputDialog("Game name");
             dialog.setTitle("Chose name for save");
             dialog.setHeaderText("Name your saved game");
@@ -186,19 +201,22 @@ public class AppController implements Observer {
             gameController.board.setGameName(result.get());
 
             /*Can be reduced, but doing the below for testing.*/
-            if(result.isPresent()) {
+            if (result.isPresent()) {
                 RepoAccesser.getRepository().insertGame(gameController.board);
                 System.out.println("Game is added and saved in DB");
-            }else {
-                System.out.println("Error occured. (add)");
+            } else {
+                System.out.println("Alert: Game has been updated.");
             }
-            if(!result.isPresent()) {
+            if (!result.isPresent()) {
                 RepoAccesser.getRepository().updateGame(gameController.board);
                 System.out.println("Game updated in DB");
-            }else {
-                System.out.println("Error occured. (update)");
+            } else {
+                System.out.println("Alert: Game has been saved and added.");
             }
+        }
     }
+
+
 
     public Map<String, Integer> getGamesAsMenuItems(){
         Map<String, Integer> gameElements = new HashMap<>();
