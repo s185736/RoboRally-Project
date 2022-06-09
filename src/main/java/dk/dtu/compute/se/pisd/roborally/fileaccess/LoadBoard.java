@@ -21,6 +21,7 @@
  */
 package dk.dtu.compute.se.pisd.roborally.fileaccess;
 
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -36,11 +37,9 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.CommandCardField;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 /**
@@ -55,7 +54,18 @@ public class LoadBoard {
     private static final String JSON_EXT = "json";
     private Repo repo;
 
+    public static ArrayList<String> ShowTheListOfTheGameBoards() {
+        ArrayList<String> boardNames = new ArrayList<>();
+        File file = new File("src/main/resources/boards");
+        File[] allFiles = file.listFiles();
 
+        for (File fName : allFiles) {
+            String nameOfBoard = Files.getNameWithoutExtension(fName.getName());
+            boardNames.add(nameOfBoard);
+            Collections.sort(boardNames);
+        }
+        return boardNames;
+    }
 
     public static Board loadBoard(String boardname) {
         if (boardname == null) {
