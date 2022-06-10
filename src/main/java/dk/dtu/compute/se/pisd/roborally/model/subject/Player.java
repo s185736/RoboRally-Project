@@ -228,6 +228,12 @@ public class Player extends Subject {
         notifyChange();
     }
 
+    public int getCP() {
+        return this.checkpoint;
+    };
+    public void setCP(int newcheckpoint) {
+        this.checkpoint = newcheckpoint;
+    };
     /**
      * @return
      */

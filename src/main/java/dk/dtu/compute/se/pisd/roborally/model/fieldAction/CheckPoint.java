@@ -36,7 +36,9 @@ public class CheckPoint extends FieldAction {
         if (player.getLastCheckPoints() < gameController.board.getCheckPoints().size()) {
             return true;
         }
-        gameController.findWinner(player);
+        if (player.getLastCheckPoints() >= 2) {
+            gameController.findWinner(player);
+        }
         return true;
     }
 }
