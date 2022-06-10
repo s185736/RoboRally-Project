@@ -21,6 +21,10 @@
  */
 package dk.dtu.compute.se.pisd.roborally.fileaccess.model;
 
+import dk.dtu.compute.se.pisd.roborally.model.Antenna;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
+import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,5 +40,22 @@ public class BoardTemplate {
     public int width;
     public int height;
 
+    public int antennaX, antennaY;
+
     public List<SpaceTemplate> spaces = new ArrayList<>();
+
+    public Board toBoard() {
+        Board board = new Board(width, height, String.valueOf(spaces));
+        Antenna antenna = new Antenna(board, this.antennaX, this.antennaY);
+        board.setAntenna(antenna);
+
+        for (int i = 0; i < board.width; i++) {
+            for (int j = 0; j < board.height; j++) {
+                if (board.getSpace(i,j) == null) {
+                    board.getSpaces()[i][j] = new Space(board,i,j);
+                }
+            }
+        }
+        return board;
+    }
 }

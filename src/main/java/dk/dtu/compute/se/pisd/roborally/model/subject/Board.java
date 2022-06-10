@@ -105,7 +105,7 @@ public  class Board extends Subject {
 
     }
 
-   public Integer getGameId() {
+    public Integer getGameId() {
         return gameId;
     }
 

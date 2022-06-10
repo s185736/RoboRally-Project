@@ -21,6 +21,9 @@
  */
 package dk.dtu.compute.se.pisd.roborally.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
@@ -28,6 +31,9 @@ import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameIndatabase;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
+import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
+import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
@@ -35,6 +41,7 @@ import javafx.application.Platform;
 import javafx.scene.control.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.*;
 import java.util.*;
 
 import static java.lang.Integer.parseInt;
@@ -52,7 +59,7 @@ public class AppController implements Observer {
     final private List<Integer> PLAYER_NUMBER_OPTIONS = Arrays.asList(2, 3, 4, 5, 6);
     final private List<String> PLAYER_COLORS = Arrays.asList("red", "green", "blue", "orange", "grey", "magenta");
     final private ArrayList<String> BOARD_NAMES = LoadBoard.ShowTheListOfTheGameBoards();
-    private GameController gameController;
+    public GameController gameController;
     private RoboRally roboRally;
     private Board board = null;
     private BoardView boardView;
@@ -252,6 +259,46 @@ public class AppController implements Observer {
 
     public void update(Subject subject) {
         // XXX do nothing for now
+    }
+
+
+    public Board createBoardFromLayout(String layout) {
+
+        GsonBuilder simpleBuilder = new GsonBuilder().registerTypeAdapter(FieldAction.class, new InterfaceAdapter<FieldAction>());
+        Gson gson = simpleBuilder.create();
+
+        InputStream is = null;
+
+        if (layout.equals("default")) {
+            is = this.getClass().getClassLoader().getResourceAsStream("boards/defaultboard.json");
+        } else {
+            try {
+                is = new FileInputStream(new File(layout));
+            } catch (FileNotFoundException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "An error occured during the loading.");
+                alert.showAndWait();
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            InputStreamReader isr = new InputStreamReader(is);
+
+            JsonReader reader = gson.newJsonReader(isr);
+
+            BoardTemplate boardTemplate = gson.fromJson(reader, BoardTemplate.class);
+            Board board = boardTemplate.toBoard();
+
+            reader.close();
+
+            return board;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
     }
 
 }
