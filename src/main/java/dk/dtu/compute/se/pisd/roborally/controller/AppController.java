@@ -31,7 +31,7 @@ import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameInDatabase;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
-import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardModel;
 import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
@@ -286,7 +286,7 @@ public class AppController implements Observer {
 
             JsonReader reader = gson.newJsonReader(isr);
 
-            BoardTemplate boardTemplate = gson.fromJson(reader, BoardTemplate.class);
+            BoardModel boardTemplate = gson.fromJson(reader, BoardModel.class);
             Board board = boardTemplate.toBoard();
 
             reader.close();

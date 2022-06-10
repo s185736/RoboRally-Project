@@ -35,14 +35,14 @@ import java.util.List;
  *
  */
 
-public class BoardTemplate {
+public class BoardModel {
 
     public int width;
     public int height;
 
     public int antennaX, antennaY;
 
-    public List<SpaceTemplate> spaces = new ArrayList<>();
+    public List<SpaceModel> spaces = new ArrayList<>();
 
     public Board toBoard() {
         Board board = new Board(width, height, String.valueOf(spaces));

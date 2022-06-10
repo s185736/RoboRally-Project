@@ -23,7 +23,7 @@ public class DatabaseConnector {
 
     // Set username and password for the mySQL.
     String username = "root";		// Username for connection
-    String password = "Sammy123";	// Password for username
+    String password = "123skole";	// Password for username
     String dlm = ";;";
 
     // Initialize connection to null.
