@@ -12,11 +12,12 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 2. Secondly, download [JavaFX](https://gluonhq.com/products/javafx/) and set it up. The software uses JavaFX UI framework. If you have problem with building the software and maven’s JavaFX installation, here you can find detailed information how to install it manually and setup the project properly, by following this tutorial: [HowToJavaFX](https://openjfx.io/openjfx-docs/#IDE-Intellij).
 3. Download and run the database, we have done it in MySQLWorkbench. 
 4. Write the password for your MySQL in the `DatabaseConnector` file in the string at the password variable. 
-5. Start the program in the class `StartRoboRally`, this class will start the program. Remember to follow the tutorial properly, at the end you'll have to add VM Options.
-6. Click 'file', and then 'New Game'.
-7. Choose which board to play with
-8. Choose amount of players.
-9. You're ready to play.
+5. Above the src folder, you'll see a sql folder. Open it and place the SQL code into the Databse.
+6. Start the program in the class `StartRoboRally`, this class will start the program. Remember to follow the tutorial properly, at the end you'll have to add VM Options.
+7. Click 'file', and then 'New Game'.
+8. Choose which board to play with
+9. Choose amount of players.
+10. You're ready to play.
 
 
 ## How to run the Application by loading a save file(Through IntelliJ)
@@ -26,17 +27,19 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 
 
 ## Current Features:
-- FileLoader - Extension to load a json file.
-- InterfaceAdapter - Converts to GSON.
+- Database - Server connected to a Database.
+- Adapter - Converts to GSON.
 - 'Left or Right' is now working properly.
-- Antenna - Still in progress.
+- Antenna - Still in progress (boardtest: antennaboard_inprogress.json).
 - Others will move when landing (pushing) on another's space.
-- Wall - You won't be able to walk through walls.
+- Walls - You won't be able to walk through walls.
 - FieldAction:
-    - CheckPoints.
     - Conveyor Belt.
     - Gear.
     - Pit.
+- Up to 3 Game Boards are defined by the JSON files.
+- Interactive cards.
+- CheckPoints - Once you've been in 1st and then the 2rd checkpoint, you'll win.
 
 ##Currently Working On:
 - Saving a game / updating.
