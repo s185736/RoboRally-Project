@@ -1,9 +1,7 @@
 package dk.dtu.compute.se.pisd.roborally.databaseAccess;
 
 /**
- * ...
- *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * A singleton class used to provide us access to the repository.
  * @author Sammy Chauhan, s191181@dtu.dk
  * @author Azmi Uslu, s185736@dtu.dk
  */
@@ -11,7 +9,7 @@ package dk.dtu.compute.se.pisd.roborally.databaseAccess;
 public class RepoAccesser {
     private static Repo repo;
 
-    public static Repo getRepository() {
+    public static Repo getRepo() {
         if(repo == null) {
             repo = new Repo(new DatabaseConnector());
         }

@@ -1,24 +1,21 @@
 package dk.dtu.compute.se.pisd.roborally.databaseAccess;
 
 /**
- * ...
- *
- * @author Ekkart Kindler, ekki@dtu.dk
+ * This class holds id, name and gameName.
  * @author Sammy Chauhan, s191181@dtu.dk
  * @author Azmi Uslu, s185736@dtu.dk
  */
 
-public class GameIndatabase {
+public class GameInDatabase {
 
-    public final int id;
-    public final String name;
+    public final int gameID;
+    public final String boardName;
     public final String gameName;
 
-    public GameIndatabase(int id, String name, String gameName) {
-        this.id = id;
-        this.name = name;
+    public GameInDatabase(int id, String boardName, String gameName) {
+        this.gameID = id;
+        this.boardName = boardName;
         this.gameName = gameName;
-
     }
 
     @Override
