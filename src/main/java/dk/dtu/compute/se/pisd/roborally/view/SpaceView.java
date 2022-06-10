@@ -163,7 +163,7 @@ public class SpaceView extends StackPane implements ViewObserver {
             space.actions.forEach(action -> {
                 if (!(action instanceof CheckPoint)) {
                 } else {
-                    implementImagesOnSpace("icons/img/cp.png", -90);
+                    implementImagesOnSpace("images/cp" + ((CheckPoint) action).no + ".png", -90);
                 }
                 if (!(action instanceof Antenna)) {
                 } else {
