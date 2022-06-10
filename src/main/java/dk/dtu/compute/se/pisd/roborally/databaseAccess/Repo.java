@@ -28,6 +28,14 @@ public class Repo{
     Repo(DatabaseConnector databaseConnector) {
         this.databaseConnector = databaseConnector;
     }
+    private static final String DB_CardSelect = "SELECT * FROM cardfield WHERE gameID = ?";
+    private PreparedStatement STATEMENT_CARD_SELECT = null;
+
+    private static final String DB_GamesSelect = "SELECT gameID, boardName, gameName FROM game ORDER BY gameID DESC LIMIT 10";
+    private PreparedStatement STATEMENT_GAMES_SELECT = null;
+
+    private static final String DB_GameSelect = "SELECT * FROM Game WHERE gameID = ?";
+    private PreparedStatement STATEMENT_GAME_SELECT = null;
 
     public boolean insertCreatedGame(Board game) {
             Connection connDB = databaseConnector.getDatabaseConnection();
@@ -107,7 +115,7 @@ public class Repo{
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Some DB error");
+            System.err.println("Error in DB.");
 
             try {
                 connDB.rollback();
@@ -206,7 +214,7 @@ public class Repo{
             return game;
         } catch (SQLException e) {
             e.printStackTrace();
-            System.err.println("Some DB error");
+            System.err.println("Error in DB.");
         }
         return null;
     }
@@ -349,7 +357,7 @@ public class Repo{
                     player.setHeading(Heading.values()[heading]);
 
                 } else {
-                    System.err.println("Game in DB does not have a player with id " + i + "!");
+                    System.err.println("Invalid player in that game, DB cannot find a player with ID: " + i + ".");
                 }
             }
             rs.close();
@@ -429,69 +437,46 @@ public class Repo{
 
     }
 
-    private static final String SQL_SELECT_GAME =
-            "SELECT * FROM Game WHERE gameID = ?";
-
-    private PreparedStatement select_game_stmt = null;
-
     private PreparedStatement getSelectGameStatementU() {
-        if (select_game_stmt == null) {
+        if (STATEMENT_GAME_SELECT == null) {
             Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                select_game_stmt = connDB.prepareStatement(
-                        SQL_SELECT_GAME,
+                STATEMENT_GAME_SELECT = connDB.prepareStatement(
+                        DB_GameSelect,
                         ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_UPDATABLE);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return select_game_stmt;
+        return STATEMENT_GAME_SELECT;
     }
-
-
-    private PreparedStatement select_players_stmt = null;
 
     private PreparedStatement getSelectCardsStatementU() {
-        if (select_cards_stmt == null) {
+        if (STATEMENT_CARD_SELECT == null) {
             Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                select_cards_stmt = connDB.prepareStatement(
-                        SQL_SELECT_CARDS,
+                STATEMENT_CARD_SELECT = connDB.prepareStatement(
+                        DB_CardSelect,
                         ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_UPDATABLE);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return select_cards_stmt;
+        return STATEMENT_CARD_SELECT;
     }
 
-    private PreparedStatement select_cards_stmt = null;
-
-    private static final String SQL_SELECT_CARDS =
-            "SELECT * FROM cardfield WHERE gameID = ?";
-
-
-    private PreparedStatement select_players_asc_stmt = null;
-
-
-    private static final String SQL_SELECT_GAMES =
-            "SELECT gameID, boardName, gameName FROM game ORDER BY gameID DESC LIMIT 10";
-
-    private PreparedStatement select_games_stmt = null;
-
-
     private PreparedStatement getSelectGameIdsStatement() {
-        if (select_games_stmt == null) {
+        if (STATEMENT_GAMES_SELECT == null) {
             Connection connDB = databaseConnector.getDatabaseConnection();
             try {
-                select_games_stmt = connDB.prepareStatement(
-                        SQL_SELECT_GAMES);
+                STATEMENT_GAMES_SELECT = connDB.prepareStatement(
+                        DB_GamesSelect);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-        return select_games_stmt;
+        return STATEMENT_GAMES_SELECT;
     }
 }

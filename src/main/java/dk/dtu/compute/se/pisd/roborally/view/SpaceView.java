@@ -165,6 +165,10 @@ public class SpaceView extends StackPane implements ViewObserver {
                 } else {
                     implementImagesOnSpace("icons/img/cp.png", -90);
                 }
+                if (!(action instanceof Antenna)) {
+                } else {
+                    implementImagesOnSpace("icons/img/antenna.png");
+                }
                 if (!(action instanceof Pit)) {
                 } else {
                     implementImagesOnSpace("icons/img/pit.png");
@@ -173,6 +177,7 @@ public class SpaceView extends StackPane implements ViewObserver {
                     return;
                 }
                 implementImagesOnSpace("icons/img/gear.png");
+
             });
             updateWalls();
             updatePlayer();

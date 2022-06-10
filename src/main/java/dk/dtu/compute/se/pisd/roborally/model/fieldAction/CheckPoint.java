@@ -7,7 +7,7 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 /**
  * ...
  *
- * @author
+ * @author Azmi Uslu,s185736@dtu.dk
  *
  */
 public class CheckPoint extends FieldAction {

@@ -45,6 +45,7 @@ public class Player extends Subject {
     public int no;
     private Space space;
     private Heading heading = SOUTH;
+    private double antennaDist;
 
     private CommandCardField[] program;
     private CommandCardField[] cards;
@@ -105,6 +106,14 @@ public class Player extends Subject {
         for (int i = 0; i < cards.length; i++) {
             cards[i] = new CommandCardField(this);
         }
+    }
+
+    public double getAntennaDist() {
+        return antennaDist;
+    }
+
+    public void setAntennaDist(double antennaDist) {
+        this.antennaDist = antennaDist;
     }
 
     /**

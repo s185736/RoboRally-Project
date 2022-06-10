@@ -28,8 +28,7 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 /**
  * ...
  *
- * @author Ekkart Kindler, ekki@dtu.dk
- *
+ * @author Azmi Uslu, s185736@dtu.dk
  */
 public abstract class FieldAction {
 
