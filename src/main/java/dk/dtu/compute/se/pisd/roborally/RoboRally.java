@@ -31,6 +31,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -109,13 +110,13 @@ public class RoboRally extends Application {
         item1.setOnAction(e -> {
             this.boardView = appController.newGame();
 
-            Scene scene = this.stage.getScene();
+            /*Scene scene = this.stage.getScene();
             Parent root = scene.getRoot();
             ((BorderPane) root).setCenter(this.boardView);
 
-
             stage.sizeToScene();
-            stage.centerOnScreen();
+            stage.centerOnScreen();*/
+            resizableScreenScrollBar();
 
             appController.startGame();
 
@@ -139,19 +140,18 @@ public class RoboRally extends Application {
             loadItem.setId(game.getValue().toString());
             loadItem.setOnAction(e -> {
                 this.boardView = this.appController.loadGame(Integer.parseInt(loadItem.getId()));
-                Scene scene = this.stage.getScene();
+                /*Scene scene = this.stage.getScene();
                 Parent root = scene.getRoot();
                 ((BorderPane) root).setCenter(this.boardView);
 
                 stage.sizeToScene();
-                stage.centerOnScreen();
+                stage.centerOnScreen();*/
+                resizableScreenScrollBar();
 
 
             });
             item4.getItems().add(loadItem);
         }
-
-
 
         MenuItem item5 = new MenuItem("Exit");
         item5.setOnAction(e -> {
@@ -176,6 +176,19 @@ public class RoboRally extends Application {
         }
 
         stage.sizeToScene();
+    }
+
+    public void resizableScreenScrollBar() {
+        Scene scene = this.stage.getScene();
+        Parent root = scene.getRoot();
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(this.boardView);
+        ((BorderPane) root).setCenter(sp);
+
+        stage.setScene(scene);
+        stage.setHeight(650);
+        stage.setWidth(570);
+        stage.centerOnScreen();
     }
 
     @Override
