@@ -124,7 +124,6 @@ public class AppController implements Observer {
         return newGameMain();
     }
 
-
     /**
      * @return
      */
@@ -183,13 +182,6 @@ public class AppController implements Observer {
 
         if (gameController.board.getGameId() == null) {
             TextInputDialog text = new TextInputDialog("Name of the game");
-            /* skal omskrives
-            text.setTitle("Chose name for save");
-            text.setHeaderText("Name your saved game");
-            text.setContentText("Please enter game name:");
-            Optional<String> result = dialog.showAndWait();
-
-             */
         }
 
         if (gameController.board.getGameId() == 0) {
@@ -203,20 +195,18 @@ public class AppController implements Observer {
             /*Can be reduced, but doing the below for testing.*/
             if (result.isPresent()) {
                 RepoAccesser.getRepo().insertCreatedGame(gameController.board);
-                System.out.println("Game is added and saved in DB");
+                System.out.println("Game is added and saved in database");
             } else {
                 System.out.println("Alert: Game has been updated.");
             }
             if (!result.isPresent()) {
                 RepoAccesser.getRepo().updateCreatedGame(gameController.board);
-                System.out.println("Game updated in DB");
+                System.out.println("Game updated in database");
             } else {
                 System.out.println("Alert: Game has been saved and added.");
             }
         }
     }
-
-
 
     public Map<String, Integer> getGamesAsMenuItems(){
         Map<String, Integer> gameElements = new HashMap<>();
@@ -252,7 +242,6 @@ public class AppController implements Observer {
         } else return boardView = new BoardView(gameController);
     }
 
-
     public boolean isGameRunning() {
         return gameController != null;
     }
@@ -260,7 +249,6 @@ public class AppController implements Observer {
     public void update(Subject subject) {
         // XXX do nothing for now
     }
-
 
     public Board createBoardFromLayout(String layout) {
 
