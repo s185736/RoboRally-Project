@@ -3,9 +3,9 @@ SET FOREIGN_KEY_CHECKS = 0;;
 CREATE TABLE if not exists game
 (
  GameID INT NOT NULL UNIQUE AUTO_INCREMENT,
- BoardName varchar(30),
+ BoardName varchar(256),
  CurrentPlayer INT,
- Phase varchar(30),
+ Phase varchar(256),
  Step INT,
  GameName varchar(256),
  PRIMARY KEY (GameID)
