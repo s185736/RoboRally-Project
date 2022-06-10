@@ -22,18 +22,16 @@
 package dk.dtu.compute.se.pisd.roborally.fileaccess.model;
 import dk.dtu.compute.se.pisd.roborally.model.Heading;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
-import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * ...
- *
+ * A space template that is used for loading from a json file.
  * @author Ekkart Kindler, ekki@dtu.dk
  *
  */
-public class SpaceTemplate {
+public class SpaceModel {
 
     public List<Heading> walls = new ArrayList<>();
     public List<FieldAction> actions = new ArrayList<>();

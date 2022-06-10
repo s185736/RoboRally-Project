@@ -27,7 +27,7 @@ import com.google.gson.stream.JsonReader;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Observer;
 import dk.dtu.compute.se.pisd.designpatterns.observer.Subject;
 import dk.dtu.compute.se.pisd.roborally.RoboRally;
-import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameIndatabase;
+import dk.dtu.compute.se.pisd.roborally.databaseAccess.GameInDatabase;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
@@ -64,7 +64,7 @@ public class AppController implements Observer {
     private Board board = null;
     private BoardView boardView;
     private int chosenNumberOfPlayers = 0;
-    private Repo repo = RepoAccesser.getRepository();
+    private Repo repo = RepoAccesser.getRepo();
     private AppController appController;
 
     /**
@@ -202,13 +202,13 @@ public class AppController implements Observer {
 
             /*Can be reduced, but doing the below for testing.*/
             if (result.isPresent()) {
-                RepoAccesser.getRepository().insertCreatedGame(gameController.board);
+                RepoAccesser.getRepo().insertCreatedGame(gameController.board);
                 System.out.println("Game is added and saved in DB");
             } else {
                 System.out.println("Alert: Game has been updated.");
             }
             if (!result.isPresent()) {
-                RepoAccesser.getRepository().updateCreatedGame(gameController.board);
+                RepoAccesser.getRepo().updateCreatedGame(gameController.board);
                 System.out.println("Game updated in DB");
             } else {
                 System.out.println("Alert: Game has been saved and added.");
@@ -220,10 +220,10 @@ public class AppController implements Observer {
 
     public Map<String, Integer> getGamesAsMenuItems(){
         Map<String, Integer> gameElements = new HashMap<>();
-        List<GameIndatabase> games = repo.getGames();
+        List<GameInDatabase> games = repo.getGamesFromDatabase();
         if (!games.isEmpty()) {
-            for (GameIndatabase game: games) {
-                gameElements.put(game.gameName, game.id);
+            for (GameInDatabase game: games) {
+                gameElements.put(game.gameName, game.gameID);
             }
         }
         return gameElements;
@@ -236,7 +236,7 @@ public class AppController implements Observer {
     public BoardView loadGame(Integer id) {
         // XXX needs to be implememted eventually
         // for now, we just create a new game
-        Board board = RepoAccesser.getRepository().loadCreatedGame(id);
+        Board board = RepoAccesser.getRepo().loadCreatedGame(id);
         gameController = new GameController(board);
         System.out.println("Game loaded");
 

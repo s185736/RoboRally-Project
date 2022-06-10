@@ -26,10 +26,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
-import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardTemplate;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardModel;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
-import dk.dtu.compute.se.pisd.roborally.fileaccess.model.SpaceTemplate;
+import dk.dtu.compute.se.pisd.roborally.fileaccess.model.SpaceModel;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 
@@ -39,8 +38,6 @@ import java.util.Collections;
 
 
 /**
- * ...
- *
  * @author Ekkart Kindler, ekki@dtu.dk
  * @author Sammy Chauhan, s191181@dtu.dk
  * @author Azmi Uslu, s185736@dtu.dk
@@ -72,7 +69,6 @@ public class LoadBoard {
         ClassLoader classLoader = LoadBoard.class.getClassLoader();
         InputStream inputStream = classLoader.getResourceAsStream(BOARDSFOLDER + "/" + boardname + "." + JSON_EXT);
         if (inputStream == null) {
-            // TODO these constants should be defined somewhere
             return new Board(8,8, boardname);
         }
 
@@ -87,10 +83,10 @@ public class LoadBoard {
 		try {
 			// fileReader = new FileReader(filename);
 			reader = gson.newJsonReader(new InputStreamReader(inputStream));
-            BoardTemplate template = gson.fromJson(reader, BoardTemplate.class);
+            BoardModel template = gson.fromJson(reader, BoardModel.class);
 			result = new Board(template.width, template.height, boardname);
             ArrayList<Space> spaces = new ArrayList<>();
-			for (SpaceTemplate spaceTemplate: template.spaces) {
+			for (SpaceModel spaceTemplate: template.spaces) {
 			    Space space = result.getSpace(spaceTemplate.x, spaceTemplate.y);
 			    if (space != null) {
                     space.getActions().addAll(spaceTemplate.actions);
@@ -118,7 +114,7 @@ public class LoadBoard {
     }
 
     public static void saveBoard(Board board, String name) {
-        BoardTemplate template = new BoardTemplate();
+        BoardModel template = new BoardModel();
         template.width = board.width;
         template.height = board.height;
 
@@ -126,7 +122,7 @@ public class LoadBoard {
             for (int j=0; j<board.height; j++) {
                 Space space = board.getSpace(i,j);
                 if (!space.getWalls().isEmpty() || !space.getActions().isEmpty()) {
-                    SpaceTemplate spaceTemplate = new SpaceTemplate();
+                    SpaceModel spaceTemplate = new SpaceModel();
                     spaceTemplate.x = space.x;
                     spaceTemplate.y = space.y;
                     spaceTemplate.actions.addAll(space.getActions());
@@ -135,15 +131,8 @@ public class LoadBoard {
                 }
             }
         }
-
-        ClassLoader classLoader = LoadBoard.class.getClassLoader();
-        // TODO: this is not very defensive, and will result in a NullPointerException
-        //       when the folder "resources" does not exist! But, it does not need
-        //       the file "simpleCards.json" to exist!
         String filename =
                 name + "." + JSON_EXT;
-                //classLoader.getResource(BOARDSFOLDER).getPath() + "/" + name + "." + JSON_EXT;
-
         // In simple cases, we can create a Gson object with new:
         //
         //   Gson gson = new Gson();
