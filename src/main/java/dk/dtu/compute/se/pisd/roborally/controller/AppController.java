@@ -290,7 +290,6 @@ public class AppController implements Observer {
             Board board = boardTemplate.toBoard();
 
             reader.close();
-
             return board;
 
         } catch (IOException e) {
