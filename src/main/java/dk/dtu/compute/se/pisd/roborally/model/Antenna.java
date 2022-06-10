@@ -21,6 +21,7 @@ public class Antenna extends FieldAction {
         public Board board;
         public final int x;
         public final int y;
+        public int ind;
 
         @Override
         public boolean doAction(GameController gameController, Space space) {
@@ -48,8 +49,9 @@ public class Antenna extends FieldAction {
             return y;
         }
 
-    public List<Player> sortedPlayers(List<Player> playerList) {
-        List<Player> playerList_UnSorted = new ArrayList<>();
+    public List<Player> playerListInSortedArray(List<Player> playerList) {
+        List<Player> playerList_UnSorted;
+        playerList_UnSorted = new ArrayList<>();
         for (int i = 0; i < playerList.size(); i++) {
             Player player = playerList.get(i);
             int step_x;
@@ -59,12 +61,11 @@ public class Antenna extends FieldAction {
             player.setAntennaDist(Math.sqrt((getAntennaX() - step_x) *(getAntennaX() - step_x) + (getAntennaY() - step_y) *(getAntennaY() - step_y)));
             playerList_UnSorted.add(player);
         }
-        sortPlayers(playerList_UnSorted);
+        playersListInSortedArrays(playerList_UnSorted);
         return playerList_UnSorted;
     }
 
-    public void sortPlayers(List<Player> playerList) {
-        int ind;
+    public void playersListInSortedArrays(List<Player> playerList) {
         ind = 0;
         for (int i = 0; i < playerList.size() - 1; i++) {
             if (!(playerList.get(i).getAntennaDist() > playerList.get(i + 1).getAntennaDist())) {

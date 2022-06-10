@@ -8,24 +8,26 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 /**
  * ...
  *
+ * @author Sammy Chauhan, s191181@dtu.dk
  * @author Azmi Uslu, s185736@dtu.dk
+ * @author Malaz Alzarrad, s180424@dtu.dk
  */
 public class Pit extends FieldAction {
 
     @Override
     public boolean doAction(GameController gameController, Space space) {
-        Board board = space.board;
+        Board boardGame = space.board;
         Player player = space.getPlayer();
         if (player == null) {
             return false;
         }
-        for (int i = 0; i < board.width; i++) {
-            for (int j = 0; j < board.height; j++) {
-                Space space1 = board.getSpace(i,j);
-                if (space1.getStartingPlayerNo() != (player.getDatabaseNo() + 1) || space1.getPlayer() != null) {
+        for (int i = 0; i < boardGame.width; i++) {
+            for (int j = 0; j < boardGame.height; j++) {
+                Space spc = boardGame.getSpace(i,j);
+                if (spc.getStartingPlayerNo() != (player.getDatabaseNo() + 1) || spc.getPlayer() != null) {
                     continue;
                 }
-                player.setSpace(space1);
+                player.setSpace(spc);
                 return true;
             }
         }

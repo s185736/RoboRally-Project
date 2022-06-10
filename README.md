@@ -34,9 +34,10 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 - Others will move when landing (pushing) on another's space.
 - Walls - You won't be able to walk through walls.
 - FieldAction:
-    - Conveyor Belt.
-    - Gear.
+    - Conveyor Belt (Blue Squire).
+    - Gear right & left.
     - Pit.
+    - Start Point.
 - Up to 3 Game Boards are defined by the JSON files.
 - Interactive cards.
 - CheckPoints - Once you've been in 1st and then the 2rd checkpoint, you'll win.
