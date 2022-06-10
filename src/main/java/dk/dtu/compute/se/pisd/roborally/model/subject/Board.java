@@ -105,6 +105,10 @@ public  class Board extends Subject {
 
     }
 
+    public void sortPlayers(){
+        playerIte=antenna.sortedPlayers(players).listIterator();
+    }
+
     public Integer getGameId() {
         return gameId;
     }

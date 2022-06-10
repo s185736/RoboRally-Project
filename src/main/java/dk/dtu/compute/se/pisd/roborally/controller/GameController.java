@@ -286,6 +286,7 @@ public class GameController {
     // XXX: V2
     public void startProgrammingPhase() {
         board.setPhase(Phase.PROGRAMMING);
+        board.sortPlayers();
         board.setCurrentPlayer(board.getPlayer(0));
         board.setStep(0);
 
@@ -308,6 +309,9 @@ public class GameController {
     // XXX: V2
     private void executeNextStep(Command command) {
         Player currentPlayer = board.getCurrentPlayer();
+        if (board.getPlayerIte()==null){
+            board.sortPlayers();
+        }
         if (board.getPhase() == Phase.ACTIVATION && currentPlayer != null) {
             int step = board.getStep();
             if (step >= 0 && step < Player.NO_REGISTERS) {
@@ -331,6 +335,7 @@ public class GameController {
                         calculatePlayerOrder();
                         step++;
                         makeProgramFieldsVisible(step);
+                        board.sortPlayers();
                         board.setStep(step);
                         board.setCurrentPlayer(board.getPlayer(0));
                     }

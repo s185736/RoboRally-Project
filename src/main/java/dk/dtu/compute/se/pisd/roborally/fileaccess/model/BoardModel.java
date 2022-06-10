@@ -39,6 +39,7 @@ public class BoardModel {
 
     public int width;
     public int height;
+    public Antenna antenna;
 
     public int antennaX, antennaY;
 
