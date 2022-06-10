@@ -7,13 +7,22 @@ This is a Roborally project from the course [02324](https://kurser.dtu.dk/course
 2. Sammy Chauhan - s191181
 3. Malaz Alzarrad - s180424
 
-## How to run the Application (Through IntelliJ)
+## How to run the Application as new game(Through IntelliJ)
 1. First of all, open the IDE and replace the files with your empty Maven project.
 2. Secondly, download [JavaFX](https://gluonhq.com/products/javafx/) and set it up. The software uses JavaFX UI framework. If you have problem with building the software and maven’s JavaFX installation, here you can find detailed information how to install it manually and setup the project properly, by following this tutorial: [HowToJavaFX](https://openjfx.io/openjfx-docs/#IDE-Intellij).
-3. Start the program in the class `StartRoboRally`, this class will start the program. Remember to follow the tutorial properly, at the end you'll have to add VM Options.
-4. Click 'file', and then 'New Game'.
-5. Choose amount of players.
-6. You're ready to play.
+3. Download and run the database, we have done it in MySQLWorkbench. 
+4. Write the password for your MySQL in the `DatabaseConnector` file in the string at the password variable. 
+5. Start the program in the class `StartRoboRally`, this class will start the program. Remember to follow the tutorial properly, at the end you'll have to add VM Options.
+6. Click 'file', and then 'New Game'.
+7. Choose which board to play with
+8. Choose amount of players.
+9. You're ready to play.
+
+
+## How to run the Application by loading a save file(Through IntelliJ)
+1. Done all the step from running the application as new game from 1 to 5.
+2. Click 'Load Game' and choose the save file.
+3. You're ready to play.
 
 
 ## Current Features:
