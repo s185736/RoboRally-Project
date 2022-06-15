@@ -17,6 +17,22 @@
       "y": 7
     },
     {
+      "walls": [
+        "WEST"
+      ],
+      "actions": [],
+      "x": 2,
+      "y": 3
+    },
+    {
+      "walls": [
+        "NORTH"
+      ],
+      "actions": [],
+      "x": 2,
+      "y": 3
+    },
+    {
       "walls": [],
       "actions": [
         {
