@@ -14,7 +14,7 @@
         }
       ],
       "x": 1,
-      "y": 5
+      "y": 7
     },
     {
       "walls": [],
@@ -28,14 +28,6 @@
       ],
       "x": 2,
       "y": 3
-    },
-    {
-      "walls": [
-        "EAST"
-      ],
-      "actions": [],
-      "x": 3,
-      "y": 1
     },
     {
       "walls": [],
@@ -62,6 +54,19 @@
       ],
       "x": 4,
       "y": 4
+    },
+    {
+      "walls": [],
+      "actions": [
+        {
+          "CLASSNAME": "dk.dtu.compute.se.pisd.roborally.model.fieldAction.Gear",
+          "INSTANCE": {
+            "coord": "RIGHT"
+          }
+        }
+      ],
+      "x": 1,
+      "y": 6
     },
     {
       "walls": [],
