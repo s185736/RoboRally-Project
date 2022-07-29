@@ -7,10 +7,9 @@ import java.io.File;
 /**
  * ...
  *
- * @author
- * Using to load a file
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
  */
-
 public class GameLoader {
 
     /**

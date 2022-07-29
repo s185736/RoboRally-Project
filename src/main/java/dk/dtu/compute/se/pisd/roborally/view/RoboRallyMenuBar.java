@@ -26,6 +26,8 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 
+import java.util.Map;
+
 /**
  * ...
  * Using menuBar instead (for now)..
@@ -42,7 +44,7 @@ public class RoboRallyMenuBar extends MenuBar {
 
     private MenuItem startNewGame;
 
-    private MenuItem loadGame;
+    private Menu loadGame;
 
     private MenuItem stopGame;
 
@@ -62,8 +64,15 @@ public class RoboRallyMenuBar extends MenuBar {
         saveGame.setOnAction( e -> this.appController.saveGame());
         controlMenu.getItems().add(saveGame);
 
-        loadGame = new MenuItem("Load Game");
-        loadGame.setOnAction( e -> this.appController.loadGame());
+        loadGame = new Menu("Load Game");
+        Map<String, Integer> games = appController.getGamesAsMenuItems();
+        for (Map.Entry<String, Integer> game: games.entrySet()) {
+            MenuItem item = new MenuItem(game.getKey());
+            item.setId(game.getValue().toString());
+            item.setOnAction(e -> this.appController.loadGame(Integer.parseInt(item.getId())));
+            loadGame.getItems().add(item);
+        }
+        loadGame.setOnAction( e -> this.appController.loadGame(-1));
         controlMenu.getItems().add(loadGame);
 
         exitApp = new MenuItem("Exit");
@@ -88,6 +97,4 @@ public class RoboRallyMenuBar extends MenuBar {
             loadGame.setVisible(true);
         }
     }
-
-
 }

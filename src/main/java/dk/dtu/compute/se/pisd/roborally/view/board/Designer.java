@@ -9,7 +9,9 @@ import javafx.stage.Stage;
 /**
  * ...
  *
- * @author
+ *  @author Sammy Chauhan, s191181@dtu.dk
+ *  @author Azmi Uslu, s185736@dtu.dk
+ *  @author Malaz Alzarrad, s180424@dtu.dk
  *
  */
 
@@ -22,24 +24,30 @@ public class Designer extends Application {
 
     @Override
     public void start(Stage stage) {
-        int width, height;
+        int width;
+        int height;
+
         Controller controller;
-        BorderPane root;
+        BorderPane borderPane;
         Scene primaryScene;
 
-        TextInputDialog textD = new TextInputDialog();
-        textD.setContentText("Choose the width of the board: ");
-        textD.showAndWait();
-        width = Integer.parseInt(textD.getResult());
-        textD.setContentText("Choose the height of the board: ");
-        textD.showAndWait();
-        height = Integer.parseInt(textD.getResult());
+        TextInputDialog dialog = new TextInputDialog();
+
+        dialog.setContentText("Selection: Width? ");
+        dialog.showAndWait();
+        width = Integer.parseInt(dialog.getResult());
+
+        dialog.setContentText("Selection: Height? ");
+        dialog.showAndWait();
+        height = Integer.parseInt(dialog.getResult());
+
         controller = new Controller(width, height);
-        stage.setTitle("The Designer of the Board!");
-        root = new BorderPane();
-        primaryScene = new Scene(root);
+
+        stage.setTitle("Board Designer..");
+        borderPane = new BorderPane();
+        primaryScene = new Scene(borderPane);
         stage.setScene(primaryScene);
-        root.setCenter(controller.newViewOperation());
+        borderPane.setCenter(controller.newViewOperation());
         stage.setResizable(false);
         stage.sizeToScene();
         stage.show();

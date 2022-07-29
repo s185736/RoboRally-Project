@@ -47,6 +47,13 @@ public class CommandCardField extends Subject {
         this.visible = true;
     }
 
+    public CommandCardField(Player player, CommandCard commandCard, boolean visible, boolean active) {
+        this.player = player;
+        this.card = commandCard;
+        this.visible = visible;
+        this.active = active;
+    }
+
     /**
      * @return
      */

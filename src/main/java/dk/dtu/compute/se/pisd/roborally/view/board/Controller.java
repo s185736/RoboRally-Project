@@ -5,7 +5,9 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 /**
  * ...
  *
- * @author
+ *  @author Sammy Chauhan, s191181@dtu.dk
+ *  @author Azmi Uslu, s185736@dtu.dk
+ *  @author Malaz Alzarrad, s180424@dtu.dk
  *
  */
 
@@ -22,7 +24,7 @@ public class Controller {
     }
 
     public void newCretBoard() {
-        this.board = new Board(this.x, this.y);
+        //this.board = new Board(this.x, this.y);
         this.board.setAntenna(null);
     }
 

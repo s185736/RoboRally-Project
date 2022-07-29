@@ -28,30 +28,32 @@ import static dk.dtu.compute.se.pisd.roborally.gameLoader.GameSaveController.sav
 /**
  * ...
  *
- * @author
+ *  @author Sammy Chauhan, s191181@dtu.dk
+ *  @author Azmi Uslu, s185736@dtu.dk
+ *  @author Malaz Alzarrad, s180424@dtu.dk
  *
  */
 
 public class DesignerView extends VBox {
 
     private Board board;
-    private GridPane gp;
-    private SpaceView[][] sw;
-    private SpaceEventHandler spaceEH;
+    private GridPane gridPane;
+    private SpaceView[][] spaceView;
+    private SpaceEventController controller;
 
-    String stringMessage = "is already on this space.";
+    String MSG = "is already on this space.";
 
-    private List optFields = new ArrayList<String>();
+    private List listFields = new ArrayList<String>();
 
     public DesignerView(Board board) {
-        Button saveButton;
-        VBox buttonsPane;
+        Button saveButtons;
+        VBox paneButtons;
         this.board = board;
         addFieldActions();
-        gp = new GridPane();
-        this.getChildren().add(gp);
-        sw = new SpaceView[board.width][board.height];
-        spaceEH = new SpaceEventHandler(this.board);
+        gridPane = new GridPane();
+        this.getChildren().add(gridPane);
+        spaceView = new SpaceView[board.width][board.height];
+        controller = new SpaceEventController(this.board);
 
         for (int x = 0; x < this.board.width; x++) {
             int y = 0;
@@ -59,34 +61,35 @@ public class DesignerView extends VBox {
                 Space space = this.board.getSpace(x, y);
                 SpaceView sw1;
                 sw1 = new SpaceView(space);
-                sw[x][y] = sw1;
-                gp.add(sw1, x, y);
-                sw1.setOnMouseClicked(spaceEH);
+                spaceView[x][y] = sw1;
+                gridPane.add(sw1, x, y);
+                sw1.setOnMouseClicked(controller);
                 y++;
             }
         }
-        saveButton = new Button("Save the Game Board.");
-        saveButton.setOnAction(e -> {saveBoard(this.board);});
-        buttonsPane = new VBox(saveButton);
-        buttonsPane.setSpacing(3.0);
-        buttonsPane.setAlignment(Pos.CENTER);
-        this.getChildren().add(buttonsPane);
+        saveButtons = new Button("Save the Game Board!");
+        saveButtons.setOnAction(e -> {saveBoard(this.board);});
+        paneButtons = new VBox(saveButtons);
+        paneButtons.setSpacing(3.0);
+        paneButtons.setAlignment(Pos.CENTER);
+        this.getChildren().add(paneButtons);
     }
 
     private void addFieldActions() {
-        this.optFields.add("Antenna");
-        this.optFields.add("Conveyor Belt");
-        this.optFields.add("Player StartField");
-        this.optFields.add("Walls");
-        this.optFields.add("Checkpoint");
-        this.optFields.add("Gear");
-        this.optFields.add("Pit");
+        this.listFields.add("Antenna");
+        this.listFields.add("Conveyor Belt");
+        this.listFields.add("Player StartField");
+        this.listFields.add("Walls");
+        this.listFields.add("Checkpoint");
+        this.listFields.add("Gear");
+        this.listFields.add("Pit");
     }
 
-    private class SpaceEventHandler implements EventHandler<MouseEvent> {
+
+    private class SpaceEventController implements EventHandler<MouseEvent> {
         public GameController gameController;
         private Board board;
-        public SpaceEventHandler(@NotNull Board board) {
+        public SpaceEventController(@NotNull Board board) {
             this.board = board;
         }
 
@@ -97,23 +100,23 @@ public class DesignerView extends VBox {
                 Space space = sw.space;
                 ChoiceDialog choiceD;
                 choiceD = new ChoiceDialog();
-                choiceD.setContentText("What do you want to add?");
-                choiceD.getItems().addAll(optFields);
+                choiceD.setContentText("What are you going to implement on the board?");
+                choiceD.getItems().addAll(listFields);
                 choiceD.showAndWait();
 
                 if (choiceD.getSelectedItem() != null) {
                     switch ((String) choiceD.getSelectedItem()) {
-                        case "Checkpoint" -> addCheckPoint(space);
-                        case "Gear" -> addGear(space);
-                        case "Pit" -> addPit(space);
+                        case "Checkpoint" -> implementCheckpoint(space);
+                        case "Gear" -> implementGear(space);
+                        case "Pit" -> implementPit(space);
                         case "Antenna" -> {
                             Antenna antenna;
                             antenna = new Antenna(this.board, space.x, space.y);
                             this.board.setAntenna(antenna);
                         }
-                        case "Conveyor Belt" -> addConveyor(space);
-                        case "Player StartField" -> selectPlayerStartNumber(space);
-                        case "Walls" -> addWalls(space);
+                        case "Conveyor Belt" -> addConveyorBelt(space);
+                        case "Player StartField" -> selectAmountOfPlayerStart(space);
+                        case "Walls" -> implementWalls(space);
                     }
                 } else {
                     return;
@@ -122,18 +125,18 @@ public class DesignerView extends VBox {
             event.consume();
         }
 
-        private void addConveyor(Space space) {
+        private void addConveyorBelt(Space space) {
             List<FieldAction> actions = space.getActions();
             for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
                 FieldAction action = actions.get(i);
                 if (!(action instanceof ConveyorBelt)) {
                     continue;
                 }
-                showAlertMessage("A Conveyor Belt " + stringMessage);
+                displayAlerts("A Conveyor Belt " + MSG);
                 return;
             }
             ChoiceDialog choiceD = new ChoiceDialog();
-            choiceD.setContentText("Which direction should it move the player?");
+            choiceD.setContentText("Choose a direction, so the element can rotate the players: ");
             choiceD.getItems().add(Heading.NORTH);
             choiceD.getItems().add(Heading.EAST);
             choiceD.getItems().add(Heading.SOUTH);
@@ -150,10 +153,10 @@ public class DesignerView extends VBox {
 
         }
 
-        private void selectPlayerStartNumber(Space space) {
+        private void selectAmountOfPlayerStart(Space space) {
             TextInputDialog textD;
             textD = new TextInputDialog();
-            textD.setContentText("Please select the player number, that should start here from 1-6.");
+            textD.setContentText("How many players are going to play? Choose between 2-6.");
             textD.showAndWait();
             if (textD.getResult() != null) {
                 space.setStartingPlayerNo(Integer.parseInt(textD.getResult()));
@@ -163,103 +166,98 @@ public class DesignerView extends VBox {
 
         }
 
-        private void showAlertMessage(String text) {
+        private void displayAlerts(String text) {
             Alert alert = new Alert(Alert.AlertType.WARNING, text);
             alert.showAndWait();
         }
+        private void implementWalls(Space space) {
+            List<Heading> listingCurrWalls;
+            listingCurrWalls = space.getWalls();
+            List<Heading> walls_free = Collections.unmodifiableList(new ArrayList<>());
+            List<Heading> walls_heading = Collections.unmodifiableList(new ArrayList<>());
 
-        private void addWalls(Space space) {
-            List<Heading> currWalls;
-            currWalls = space.getWalls();
-            List<Heading> freeWalls = Collections.unmodifiableList(new ArrayList<>());
-            List<Heading> headings = Collections.unmodifiableList(new ArrayList<>());
+            walls_heading.add(Heading.NORTH);
+            walls_heading.add(Heading.EAST);
+            walls_heading.add(Heading.SOUTH);
+            walls_heading.add(Heading.WEST);
 
-            headings.add(Heading.NORTH);
-            headings.add(Heading.EAST);
-            headings.add(Heading.SOUTH);
-            headings.add(Heading.WEST);
-
-            headings.stream().filter(heading -> !currWalls.contains(heading)).forEachOrdered(freeWalls::add);
-            if (freeWalls.isEmpty()) {
-                return;
-            }
-            ChoiceDialog textD = new ChoiceDialog();
-            textD.setContentText("Choose the direction where a wall should be placed.");
-            textD.getItems().addAll(freeWalls);
-            textD.showAndWait();
-            if (textD.getSelectedItem() != null) {
-                space.addWall((Heading) textD.getSelectedItem());
+            walls_heading.stream().filter(heading -> !listingCurrWalls.contains(heading)).forEachOrdered(walls_free::add);
+            if (!walls_free.isEmpty()) {
+                ChoiceDialog textD = new ChoiceDialog();
+                textD.setContentText("Choose a direction of a wall: ");
+                textD.getItems().addAll(walls_free);
+                textD.showAndWait();
+                if (textD.getSelectedItem() != null) {
+                    space.addWall((Heading) textD.getSelectedItem());
+                } else {
+                    return;
+                }
             } else {
                 return;
             }
         }
 
-        private void addCheckPoint(Space space) {
-            List<FieldAction> actions = space.getActions();
-            for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
-                FieldAction action = actions.get(i);
+        private void implementCheckpoint(Space space) {
+            List<FieldAction> fieldActions = space.getActions();
+            for (int i = 0, actionsSize = fieldActions.size(); i < actionsSize; i++) {
+                FieldAction action = fieldActions.get(i);
                 if (!(action instanceof CheckPoint)) {
-                } else {
-                    showAlertMessage("A Checkpoint " + stringMessage);
-                    return;
+                    continue;
                 }
-            }
-
-            TextInputDialog textD = new TextInputDialog();
-            textD.setContentText("Which number of checkpoint should this be?");
-            textD.showAndWait();
-            if (textD.getResult() == null) {
+                displayAlerts("A Checkpoint " + MSG);
                 return;
             }
-            int no;
-            no = Integer.parseInt(textD.getResult());
-            if (no > board.getCheckPoints().size()) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setContentText("How many check points should this have? ");
+            dialog.showAndWait();
+            if (dialog.getResult() == null) {
+                return;
+            }
+            int num;
+            num = Integer.parseInt(dialog.getResult());
+            if (num > board.getCheckPoints().size()) {
             } else {
-                String stringMessage = "You have inserted a number, that already exists. You must atleast insert " + (board.getCheckPoints().size() + 1+".");
+                String stringMessage = "That one does already exist, try again..";
                 Alert warning = new Alert(Alert.AlertType.WARNING, stringMessage);
                 warning.showAndWait();
-                addCheckPoint(space);
+                implementCheckpoint(space);
             }
-            CheckPoint checkpoint = new CheckPoint(no);
+            CheckPoint checkpoint = new CheckPoint(num);
             space.addAction(checkpoint);
         }
 
-        private void addGear(Space space) {
-            List<FieldAction> actions = space.getActions();
-            for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
-                FieldAction action = actions.get(i);
-                if (!(action instanceof Gear)) {
-                } else {
-                    showAlertMessage("A Gear " + stringMessage);
-                    return;
+        private void implementGear(Space space) {
+            List<FieldAction> fieldActions = space.getActions();
+            for (int i = 0, actionsSize = fieldActions.size(); i < actionsSize; i++) {
+                FieldAction fieldAction = fieldActions.get(i);
+                if (!(fieldAction instanceof Gear)) {
+                    continue;
                 }
+                displayAlerts("A Gear " + MSG);
+                return;
             }
 
             List<Coordination> directions = new ArrayList<>();
-
             directions.add(Coordination.LEFT);
             directions.add(Coordination.RIGHT);
-
             ChoiceDialog choiceD = new ChoiceDialog();
-            choiceD.setContentText("Choose the direction where the gear should turn.");
+            choiceD.setContentText("Choose a direction of gear, where it should rotate: ");
             choiceD.getItems().addAll(directions);
             choiceD.showAndWait();
-
             if (choiceD.getSelectedItem() == null) {
                 return;
             }
             space.addGear((Coordination) choiceD.getSelectedItem());
-
         }
 
-        private void addPit(Space space) {
+        private void implementPit(Space space) {
             List<FieldAction> actions = space.getActions();
             for (int i = 0, actionsSize = actions.size(); i < actionsSize; i++) {
                 FieldAction action = actions.get(i);
                 if (!(action instanceof Pit)) {
                     continue;
                 }
-                showAlertMessage("A Pit " + stringMessage);
+                displayAlerts("A Pit " + MSG);
                 return;
             }
             space.addAction(new Pit());

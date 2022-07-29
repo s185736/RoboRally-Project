@@ -45,6 +45,7 @@ public class Player extends Subject {
     public int no;
     private Space space;
     private Heading heading = SOUTH;
+    private double antennaDist;
 
     private CommandCardField[] program;
     private CommandCardField[] cards;
@@ -67,6 +68,7 @@ public class Player extends Subject {
      * @param name
      */
     public Player(@NotNull Board board, String color, @NotNull String name) {
+        this.no = playerCount;
         playerCount++;
 
         this.board = board;
@@ -84,6 +86,34 @@ public class Player extends Subject {
         for (int i = 0; i < cards.length; i++) {
             cards[i] = new CommandCardField(this);
         }
+    }
+    public Player(@NotNull Board board, String color, @NotNull String name, @NotNull Space space) {
+        this.no = playerCount;
+        playerCount++;
+
+        this.board = board;
+        this.name = name;
+        this.color = color;
+
+        this.space = space;
+
+        program = new CommandCardField[NO_REGISTERS];
+        for (int i = 0; i < program.length; i++) {
+            program[i] = new CommandCardField(this);
+        }
+
+        cards = new CommandCardField[NO_CARDS];
+        for (int i = 0; i < cards.length; i++) {
+            cards[i] = new CommandCardField(this);
+        }
+    }
+
+    public double getAntennaDist() {
+        return antennaDist;
+    }
+
+    public void setAntennaDist(double antennaDist) {
+        this.antennaDist = antennaDist;
     }
 
     /**
@@ -168,6 +198,7 @@ public class Player extends Subject {
      */
     public void setDatabaseNo(int databaseNo) {
         this.dbNo = databaseNo;
+        this.no = databaseNo;
     }
 
     /**
@@ -197,10 +228,23 @@ public class Player extends Subject {
         notifyChange();
     }
 
+    public int getCP() {
+        return this.checkpoint;
+    };
+    public void setCP(int newcheckpoint) {
+        this.checkpoint = newcheckpoint;
+    };
     /**
      * @return
      */
     public int getLastCheckPoints() {
         return checkpoint;
+    }
+    public CommandCardField[] getCards(){
+        return this.cards;
+    }
+
+    public CommandCardField[] getProgram() {
+        return program;
     }
 }

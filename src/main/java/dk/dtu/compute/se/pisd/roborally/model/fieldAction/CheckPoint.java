@@ -7,8 +7,9 @@ import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
 /**
  * ...
  *
- * @author
- *
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
+ * @author Malaz Alzarrad, s180424@dtu.dk
  */
 public class CheckPoint extends FieldAction {
 
@@ -36,7 +37,9 @@ public class CheckPoint extends FieldAction {
         if (player.getLastCheckPoints() < gameController.board.getCheckPoints().size()) {
             return true;
         }
-        gameController.findWinner(player);
+        if (player.getLastCheckPoints() >= 2) {
+            gameController.findWinner(player);
+        }
         return true;
     }
 }

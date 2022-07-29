@@ -22,16 +22,21 @@
 package dk.dtu.compute.se.pisd.roborally;
 
 import dk.dtu.compute.se.pisd.roborally.controller.AppController;
+import dk.dtu.compute.se.pisd.roborally.controller.GameController;
 import dk.dtu.compute.se.pisd.roborally.view.BoardView;
+import dk.dtu.compute.se.pisd.roborally.view.RoboRallyMenuBar;
 import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.Map;
 
 /**
  * ...
@@ -41,9 +46,9 @@ import javafx.stage.Stage;
  */
 public class RoboRally extends Application {
 
-    /*private AppController appController;
+    private AppController appController = new AppController(this) ;
 
-    private RoboRallyMenuBar menuBar;
+    private RoboRallyMenuBar menubar;
 
     private Menu controlMenu;
 
@@ -55,7 +60,7 @@ public class RoboRally extends Application {
 
     private MenuItem stopGame;
 
-    private MenuItem exitApp;*/
+    private MenuItem exitApp;
 
     private static final int MIN_APP_WIDTH = 600;
 
@@ -105,13 +110,13 @@ public class RoboRally extends Application {
         item1.setOnAction(e -> {
             this.boardView = appController.newGame();
 
-            Scene scene = this.stage.getScene();
+            /*Scene scene = this.stage.getScene();
             Parent root = scene.getRoot();
             ((BorderPane) root).setCenter(this.boardView);
 
-
             stage.sizeToScene();
-            stage.centerOnScreen();
+            stage.centerOnScreen();*/
+            resizableScreenScrollBar();
 
             appController.startGame();
 
@@ -128,18 +133,25 @@ public class RoboRally extends Application {
             appController.saveGame();
         });
 
-        MenuItem item4 = new MenuItem("Load Game");
-        item4.setOnAction(e -> {
-            appController.loadGame();
+        Menu item4 = new Menu("Load Game");
+        Map<String, Integer> games = appController.getGamesAsMenuItems();
+        for (Map.Entry<String, Integer> game: games.entrySet()) {
+            MenuItem loadItem = new MenuItem(game.getKey());
+            loadItem.setId(game.getValue().toString());
+            loadItem.setOnAction(e -> {
+                this.boardView = this.appController.loadGame(Integer.parseInt(loadItem.getId()));
+                /*Scene scene = this.stage.getScene();
+                Parent root = scene.getRoot();
+                ((BorderPane) root).setCenter(this.boardView);
 
-            Scene scene = this.stage.getScene();
-            Parent root = scene.getRoot();
-            ((BorderPane) root).setCenter(this.boardView);
+                stage.sizeToScene();
+                stage.centerOnScreen();*/
+                resizableScreenScrollBar();
 
-            stage.sizeToScene();
-            stage.centerOnScreen();
-        });
 
+            });
+            item4.getItems().add(loadItem);
+        }
 
         MenuItem item5 = new MenuItem("Exit");
         item5.setOnAction(e -> {
@@ -147,13 +159,13 @@ public class RoboRally extends Application {
 
         });
 
-        menu.getItems().addAll(item1, item2, item3, item4, item5);
-        menuBar.getMenus().add(menu);
+        menu.getItems().addAll(item1, item2, item3, item5);
+        menuBar.getMenus().addAll(menu, item4);
 
         return menuBar;
     }
 
-   /* public void createBoardView(GameController gameController) {
+   public void createBoardView(GameController gameController) {
         // if present, remove old BoardView
         boardRoot.getChildren().clear();
 
@@ -164,7 +176,20 @@ public class RoboRally extends Application {
         }
 
         stage.sizeToScene();
-    }*/
+    }
+
+    public void resizableScreenScrollBar() {
+        Scene scene = this.stage.getScene();
+        Parent root = scene.getRoot();
+        ScrollPane sp = new ScrollPane();
+        sp.setContent(this.boardView);
+        ((BorderPane) root).setCenter(sp);
+
+        stage.setScene(scene);
+        stage.setHeight(650);
+        stage.setWidth(570);
+        stage.centerOnScreen();
+    }
 
     @Override
     public void stop() throws Exception {

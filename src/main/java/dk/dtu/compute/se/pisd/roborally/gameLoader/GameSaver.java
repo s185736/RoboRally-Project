@@ -7,9 +7,10 @@ import java.io.File;
 /**
  * ...
  *
- * @author
- *
+ * @author Sammy Chauhan, s191181@dtu.dk
+ * @author Azmi Uslu, s185736@dtu.dk
  */
+
 
 public class GameSaver {
 

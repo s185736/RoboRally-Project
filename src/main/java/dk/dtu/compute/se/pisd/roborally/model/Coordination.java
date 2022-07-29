@@ -3,7 +3,7 @@ package dk.dtu.compute.se.pisd.roborally.model;
 /**
  * ...
  *
- * @author
+ * @author Azmi Uslu, s185736@dtu.dk
  *
  */
 

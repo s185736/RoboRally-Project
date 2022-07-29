@@ -10,7 +10,9 @@ import java.util.List;
 /**
  * ...
  *
- * @author
+ *  @author Sammy Chauhan, s191181@dtu.dk
+ *  @author Azmi Uslu, s185736@dtu.dk
+ *  @author Malaz Alzarrad, s180424@dtu.dk
  *
  */
 
@@ -47,8 +49,8 @@ public class BoardLayout {
     public Board getInfoToGameBoard() {
         Board board;
         Antenna antenna;
-        board = new Board(this.x, this.y);
-        antenna = new Antenna(board, this.ant_X, this.ant_y);
+        board = new Board(this.x, this.y,"cæemw");
+        antenna = new Antenna(this.ant_X, this.ant_y);
         board.setAntenna(antenna);
         splay.stream().map(spaceLayout -> spaceLayout.getInfoToGameSpace(board)).forEach(space -> board.getSpaces()[space.x][space.y] = space);
 
