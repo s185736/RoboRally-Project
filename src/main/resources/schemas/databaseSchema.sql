@@ -1,5 +1,8 @@
 SET FOREIGN_KEY_CHECKS = 0;;
 
+CREATE SCHEMA IF NOT EXISTS `roborally` DEFAULT CHARACTER SET utf8 ;;
+USE `roborally` ;;
+
 CREATE TABLE if not exists game
 (
  GameID INT NOT NULL UNIQUE AUTO_INCREMENT,
@@ -22,12 +25,6 @@ CREATE TABLE if not exists player
  PRIMARY KEY (PlayerNo, GameID),
  FOREIGN KEY (GameID) REFERENCES game(GameID));;
 
-CREATE TABLE blog (
-                      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-                      title VARCHAR(500) NOT NULL,
-                      content VARCHAR(5000) NOT NULL
-);;
-
 CREATE TABLE if not exists CardFieldCommands
 (
     PlayerNo INT,
@@ -37,3 +34,9 @@ CREATE TABLE if not exists CardFieldCommands
     Active BIT(1),   -- 1 = true 0 = false.
     IsProgam BIT(1),
     FOREIGN KEY (PlayerNo, GameID) REFERENCES player(PlayerNo, GameID));;
+
+CREATE TABLE blog
+(
+      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(500) NOT NULL,
+      content VARCHAR(5000) NOT NULL);;
