@@ -4,11 +4,10 @@ import dk.dtu.compute.se.pisd.roborally.RoboRally;
 import dk.dtu.compute.se.pisd.roborally.model.Heading;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Player;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Space;
-import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class GameControllerTest {
 
@@ -37,7 +36,7 @@ class GameControllerTest {
     void someTest() {
         Player playerTester = boardGame.board.getCurrentPlayer();
         boardGame.moveCurrentPlayerToSpace(boardGame.board.getSpace(0, 4));
-        Assertions.assertEquals(playerTester, boardGame.board.getSpace(0, 4).getPlayer(), "Player " + playerTester.getName() + " should beSpace (0,4)!");
+        assertEquals(playerTester, boardGame.board.getSpace(0, 4).getPlayer(), "Player " + playerTester.getName() + " should beSpace (0,4)!");
     }
 
     @Test

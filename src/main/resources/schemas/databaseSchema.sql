@@ -22,6 +22,12 @@ CREATE TABLE if not exists player
  PRIMARY KEY (PlayerNo, GameID),
  FOREIGN KEY (GameID) REFERENCES game(GameID));;
 
+CREATE TABLE blog (
+                      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                      title VARCHAR(500) NOT NULL,
+                      content VARCHAR(5000) NOT NULL
+);;
+
 CREATE TABLE if not exists CardFieldCommands
 (
     PlayerNo INT,
