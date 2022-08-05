@@ -34,7 +34,7 @@ import dk.dtu.compute.se.pisd.roborally.databaseAccess.Repo;
 import dk.dtu.compute.se.pisd.roborally.databaseAccess.RepoAccesser;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.LoadBoard;
 import dk.dtu.compute.se.pisd.roborally.fileaccess.model.BoardModel;
-import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
+//import dk.dtu.compute.se.pisd.roborally.model.InterfaceAdapter;
 import dk.dtu.compute.se.pisd.roborally.model.fieldAction.FieldAction;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Board;
 import dk.dtu.compute.se.pisd.roborally.model.subject.Player;

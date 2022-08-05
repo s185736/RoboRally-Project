@@ -25,13 +25,13 @@ public class Repo{
     Repo(DatabaseConnector databaseConnector) {
         this.databaseConnector = databaseConnector;
     }
-    private static final String Database_CardSelect = "SELECT * FROM cardfield WHERE gameID = ?";
+    private static final String Database_CardSelect = "SELECT * FROM Card_field_command WHERE Game_id = ?";
     private PreparedStatement STMT_Card_Select = null;
 
-    private static final String Database_GamesSelect = "SELECT gameID, boardName, gameName FROM game ORDER BY gameID DESC LIMIT 10";
+    private static final String Database_GamesSelect = "SELECT game_id, board_name, game_name FROM game ORDER BY game_id DESC LIMIT 10";
     private PreparedStatement STMT_Games_Select = null;
 
-    private static final String Database_GameSelect = "SELECT * FROM Game WHERE gameID = ?";
+    private static final String Database_GameSelect = "SELECT * FROM Game WHERE game_id = ?";
     private PreparedStatement STMT_Game_Select = null;
 
     public boolean insertCreatedGame(Board boardGame) {
@@ -39,7 +39,7 @@ public class Repo{
             try {
                 DBConnector.setAutoCommit(false);
                 PreparedStatement pStatement = DBConnector.prepareStatement(
-                        "INSERT INTO Game(boardName, currentPlayer, phase, step, gameName) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO Game(board_name, current_player, phase, step, game_name) VALUES (?, ?, ?, ?, ?)",
                         Statement.RETURN_GENERATED_KEYS);
                 pStatement.setString(1, boardGame.boardName);
                 pStatement.setNull(2, boardGame.getCurrentPlayer().no);
@@ -61,7 +61,7 @@ public class Repo{
 
                 ResultSet resultSet = pStatement.executeQuery();
                 if (resultSet.next()) {
-                    resultSet.updateInt("CurrentPlayer", boardGame. getPlayerNo(boardGame.getCurrentPlayer()));
+                    resultSet.updateInt("Current_player", boardGame. getPlayerNo(boardGame.getCurrentPlayer()));
                     resultSet.updateRow();
                 }
                 resultSet.close();
@@ -90,7 +90,7 @@ public class Repo{
 
             ResultSet resultSet = pStatement.executeQuery();
             if (resultSet.next()) {
-                resultSet.updateInt("CurrentPlayer", game.getPlayerNo(game.getCurrentPlayer()));
+                resultSet.updateInt("Current_player", game.getPlayerNo(game.getCurrentPlayer()));
                 resultSet.updateInt("Phase", game.getPhase().ordinal());
                 resultSet.updateInt("Step", game.getStep());
                 resultSet.updateRow();
@@ -124,15 +124,15 @@ public class Repo{
         Connection dbConnector = databaseConnector.getDatabaseConnection();
         try {
             pStatement = dbConnector.prepareStatement(
-                    "Select * from CardFieldCommands where GameID = ?",
+                    "Select * from CardFieldCommands where Game_id = ?",
                     ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_UPDATABLE);
             pStatement.setInt(1, boardGame.getGameId());
             ResultSet resultSet = pStatement.executeQuery();
             while (resultSet.next()) {
-                int type = resultSet.getInt("IsProgram");
+                int type = resultSet.getInt("Is_program");
                 int coordination = resultSet.getInt("Position");
-                int playerID = resultSet.getInt("PlayerNo");
+                int playerID = resultSet.getInt("Player_no");
                 CommandCardField cmdCardField;
                 CommandCard progCmdCard;
 
@@ -181,7 +181,7 @@ public class Repo{
                 if (boardGame == null) {
                     return null;
                 }
-                playerID = resultSet.getInt("CurrentPlayer");
+                playerID = resultSet.getInt("Current_player");
                 boardGame.setPhase(Phase.values()[resultSet.getInt("Phase")]);
                 boardGame.setStep(resultSet.getInt("Step"));
 
@@ -215,8 +215,8 @@ public class Repo{
             PreparedStatement pStatement = getSelectGameIdsStatement();
             ResultSet resultSet = pStatement.executeQuery();
             while (resultSet.next()) {
-                int gameID = resultSet.getInt("GameID");
-                String boardName = resultSet.getString("BoardName");
+                int gameID = resultSet.getInt("Game_id");
+                String boardName = resultSet.getString("Board_name");
                 String gameName = resultSet.getString(3);
                 listInDB.add(new GameInDatabase(gameID, boardName, gameName));
             }
@@ -232,7 +232,7 @@ public class Repo{
         Connection dbConnector = databaseConnector.getDatabaseConnection();
         try {
             pStatement = dbConnector.prepareStatement(
-                    "SELECT * FROM Player WHERE gameID = ?",
+                    "SELECT * FROM Player WHERE game_id = ?",
                     ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_UPDATABLE);
 
@@ -241,12 +241,12 @@ public class Repo{
             for (int i = 0; i < boardGame.getPlayersNumber(); i++) {
                 Player player = boardGame.getPlayer(i);
                 resultSet.moveToInsertRow();
-                resultSet.updateInt("GameID", boardGame.getGameId());
-                resultSet.updateInt("PlayerNo", i);
+                resultSet.updateInt("Game_id", boardGame.getGameId());
+                resultSet.updateInt("Player_no", i);
                 resultSet.updateString("Name", player.getName());
                 resultSet.updateString("Color", player.getColor());
-                resultSet.updateInt("XPosition", player.getSpace().x);
-                resultSet.updateInt("YPosition", player.getSpace().y);
+                resultSet.updateInt("X_position", player.getSpace().x);
+                resultSet.updateInt("Y_position", player.getSpace().y);
                 resultSet.updateInt("heading", player.getHeading().ordinal());
                 resultSet.insertRow();
             }
@@ -259,9 +259,9 @@ public class Repo{
     //Method for inserting card fields in the database
     private boolean createNewCardFields(Board game) throws SQLException {
         try {
-            PreparedStatement pStatement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
+            PreparedStatement pStatement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM Card_field_command WHERE game_id = ?");
             pStatement.setInt(1, game.getGameId());
-            pStatement = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO CardFieldCommands (GameID, PlayerNo, isProgram, Active, Visible, Command, Position) VALUES (?,?,?,?,?,?,?)");
+            pStatement = databaseConnector.getDatabaseConnection().prepareStatement("INSERT INTO Card_field_command (Game_id, Player_no, is_program, Active, Visible, Command, Position) VALUES (?,?,?,?,?,?,?)");
 
             for (int i = 0; i < game.getPlayersNumber(); i++) {
                 Player p = game.getPlayer(i);
@@ -308,21 +308,21 @@ public class Repo{
         Connection dbConnector = databaseConnector.getDatabaseConnection();
         try {
             pStatement = dbConnector.prepareStatement(
-                    "SELECT * FROM Player WHERE GameID = ? ORDER BY PlayerNo ASC");
+                    "SELECT * FROM Player WHERE Game_id = ? ORDER BY Player_no ASC");
             pStatement.setInt(1, boardGame.getGameId());
 
             ResultSet resultSet = pStatement.executeQuery();
             int i = 0;
             while (resultSet.next()) {
-                int playerNo = resultSet.getInt("PlayerNo");
+                int playerNo = resultSet.getInt("Player_no");
                 if (i++ == playerNo) {
                     String name = resultSet.getString("Name");
                     String color = resultSet.getString("Color");
                     Player p = new Player(boardGame, color, name);
                     boardGame.addPlayer(p);
 
-                    int x = resultSet.getInt("XPosition");
-                    int y = resultSet.getInt("YPosition");
+                    int x = resultSet.getInt("X_position");
+                    int y = resultSet.getInt("Y_position");
                     p.setSpace(boardGame.getSpace(x, y));
                     int direction = resultSet.getInt("Heading");
                     p.setHeading(Heading.values()[direction]);
@@ -339,7 +339,7 @@ public class Repo{
 
     //Method to put the command cards into the card fields of the player from the database.
     private void getCardFields(Board boardGame) throws SQLException {
-        PreparedStatement pStatement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM CardFieldCommands WHERE gameID = ?");
+        PreparedStatement pStatement = databaseConnector.getDatabaseConnection().prepareStatement("SELECT * FROM Card_field_command WHERE game_id = ?");
         pStatement.setInt(1, boardGame.getGameId());
         ResultSet resultSet = pStatement.executeQuery();
         int playerNo;
@@ -351,8 +351,8 @@ public class Repo{
 
         while (resultSet.next()) {
             for (int i = 0; i < boardGame.getPlayersNumber(); i++) {
-                playerNo = resultSet.getInt("PlayerNo");
-                isProgram = resultSet.getInt("IsProgram");
+                playerNo = resultSet.getInt("Player_no");
+                isProgram = resultSet.getInt("Is_program");
                 active = resultSet.getInt("Active");
                 cmd = resultSet.getObject("Command");
                 visible = resultSet.getInt("Visible");
@@ -390,15 +390,15 @@ public class Repo{
         Connection dbConnector = databaseConnector.getDatabaseConnection();
         try {
             pStatement = dbConnector.prepareStatement(
-                    "SELECT * FROM Player WHERE GameID = ? ORDER BY PlayerNo ASC");
+                    "SELECT * FROM Player WHERE Game_id = ? ORDER BY Player_no ASC");
             pStatement.setInt(1, boardGame.getGameId());
 
             ResultSet resultSet = pStatement.executeQuery();
             while (resultSet.next()) {
-                int playerNo = resultSet.getInt("PlayerNo");
+                int playerNo = resultSet.getInt("Player_no");
                 Player p = boardGame.getPlayer(playerNo);
-                resultSet.updateInt("XPosition", p.getSpace().x);
-                resultSet.updateInt("YPosition", p.getSpace().y);
+                resultSet.updateInt("X_position", p.getSpace().x);
+                resultSet.updateInt("Y_position", p.getSpace().y);
                 resultSet.updateInt("Header", p.getHeading().ordinal());
                 resultSet.updateRow();
             }
